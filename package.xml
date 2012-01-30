@@ -1,0 +1,477 @@
+<?xml version="1.0"?>
+<package xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" packagerversion="1.4.0a11" version="2.0" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
+ <name>Chiara_PEAR_Server</name>
+ <channel>chiara-local</channel>
+ <summary>A lightweight pearweb-compatible channel server for hosting a PEAR channel</summary>
+ <description>Chiara_PEAR_Server provides a modular
+approach to implementing the channel protocol.
+By default, a lightweight database is used,
+accessed by a DB_DataObject backend,
+with an administrative frontend using HTML_QuickForm and
+xml-rpc frontend using Chiara_XML_RPC5
+Chiara_PEAR_Server replaces PEAR_Server</description>
+ <lead>
+  <name>Greg Beaver</name>
+  <user>cellog</user>
+  <email>cellog@php.net</email>
+  <active>yes</active>
+ </lead>
+ <lead>
+  <name>Davey Shafik</name>
+  <user>davey</user>
+  <email>davey@php.net</email>
+  <active>yes</active>
+ </lead>
+ <date>2005-04-17</date>
+ <time>17:22:18</time>
+ <version>
+  <release>0.17.0</release>
+  <api>0.17.0</api>
+ </version>
+ <stability>
+  <release>alpha</release>
+  <api>alpha</api>
+ </stability>
+ <license uri="http://www.php.net/license/3_0.txt">PHP License</license>
+ <notes>Implement ssl, port, path options for channel server connection and xmlrpc.php file name
+    rename to Chiara_PEAR_Server
+    add ability to deprecate a package in favor of another</notes>
+ <contents>
+  <dir baseinstalldir="Chiara/PEAR" name="/">
+   <file baseinstalldir="Chiara/PEAR" md5sum="c04ff565dc2a65e02c7d4f02bc66486a" name="data/DBDataObject/pearserver.ini" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="5ab56d0bd9c21cb3f061fcc357246fba" name="data/pearserver.sql" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="07ba3a53b03a622fb560e3cdbc30093a" name="data/upgrade-0.12.0_0.13.0.sql" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="9245dd65f9a98d7e372736b5f7f428a9" name="data/deprecatedpackages-chiara_pear_server-0.17.0.sql" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="73cf7006a8e0825da5ab6bfb7794f1fa" name="data/pear_server.css" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="4110a5fe9147a91cf149c1535186e9c6" name="examples/xmlrpc.php" role="doc"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="5b1d73213d5f3e7ba662388903dd3733" name="Server/Backend/DBDataObject/Categories.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="e5867bc45d45faf270cb76ade52c0113" name="Server/Backend/DBDataObject/Channels.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="23240d57f6c258055891f193c26c7f68" name="Server/Backend/DBDataObject/Handles.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="917fd9ebee14b119dc1e3cdee55bda77" name="Server/Backend/DBDataObject/Maintainers.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="44286b6ff1f20c26fdc5484755724789" name="Server/Backend/DBDataObject/Packages.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="58d8fa33aef8e2507a675b0185d47785" name="Server/Backend/DBDataObject/Package_extras.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="7c37f9f66076c50914d23f264c3e13e7" name="Server/Backend/DBDataObject/Releases.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="4e1ebe8bca2006036b4cdb1d2ade8afa" name="Server/Backend/DBDataObject.php" role="php">
+    <tasks:replace from="@data-dir@" to="data_dir" type="pear-config"/>
+    <tasks:replace from="@php-dir@" to="php_dir" type="pear-config"/>
+   </file>
+   <file baseinstalldir="Chiara/PEAR" md5sum="9cb1b35686d18df392af2a3feb16a94b" name="Server/Frontend/HTMLQuickForm.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="4f7d5affb49cd38ab50911be9f27c038" name="Server/Frontend/Xmlrpc.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="591b1331054554428da86132857d4b17" name="Server/Frontend/Xmlrpc5.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="cfb98683244a51cbfdf72b08dac2b190" name="Server/Backend.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="3cc0f2fdf6f8242a4f4c1e32e060f833" name="Server/Exception.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="e7c92c79ed7d708a2e67b66dbdb62daf" name="Server/Frontend.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="b45466760ee1535b6fde965bd4ca3c84" name="Server/Maintainer.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="c3d7283ad0344474b23878a082c2e69e" name="Server/Package.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="0dea0811f6d843b698203c48cd16dce4" name="Server/mysqlinstall.php" role="php">
+    <tasks:postinstallscript>
+     <paramgroup>
+      <id>questionCreate</id>
+      <param>
+       <name>doit</name>
+       <prompt>Create/Upgrade database for Chiara_PEAR_Server? All previous installations must run the script</prompt>
+       <type>string</type>
+       <default>yes</default>
+      </param>
+     </paramgroup>
+     <paramgroup>
+      <id>databaseSetup</id>
+      <param>
+       <name>database</name>
+       <prompt>Mysql database</prompt>
+       <type>string</type>
+       <default>pear</default>
+      </param>
+      <param>
+       <name>user</name>
+       <prompt>Mysql Username (must have create permision)</prompt>
+       <type>string</type>
+       <default>pear</default>
+      </param>
+      <param>
+       <name>password</name>
+       <prompt>Mysql password</prompt>
+       <type>string</type>
+       <default>pear</default>
+      </param>
+      <param>
+       <name>dbhost</name>
+       <prompt>Database Host</prompt>
+       <type>string</type>
+       <default>localhost</default>
+      </param>
+      <param>
+       <name>handle</name>
+       <prompt>Channel Administrator Handle (package.xml user tag)</prompt>
+       <type>string</type>
+      </param>
+      <param>
+       <name>name</name>
+       <prompt>Channel Name (server uri like pear.php.net)</prompt>
+       <type>string</type>
+      </param>
+     </paramgroup>
+     <paramgroup>
+      <id>channelCreate</id>
+      <param>
+       <name>alias</name>
+       <prompt>Suggested Channel Alias (like pear)</prompt>
+       <type>string</type>
+      </param>
+      <param>
+       <name>summary</name>
+       <prompt>Channel summary</prompt>
+       <type>string</type>
+      </param>
+     </paramgroup>
+     <paramgroup>
+      <id>administrator</id>
+      <param>
+       <name>name</name>
+       <prompt>Channel Administrator Real Name</prompt>
+       <type>string</type>
+      </param>
+      <param>
+       <name>email</name>
+       <prompt>Channel Administrator Email</prompt>
+       <type>string</type>
+      </param>
+      <param>
+       <name>password</name>
+       <prompt>Channel Administrator Password</prompt>
+       <type>string</type>
+      </param>
+     </paramgroup>
+     <paramgroup>
+      <id>files</id>
+      <param>
+       <name>pearconfigloc</name>
+       <prompt>PEAR Configuration File Location (pear.ini/.pearrc/pear.conf)</prompt>
+       <type>string</type>
+       <default>(Use default)</default>
+      </param>
+      <param>
+       <name>docroot</name>
+       <prompt>Path to document root (htdocs or public_html)</prompt>
+       <type>string</type>
+      </param>
+      <param>
+       <name>xmlrpcphp</name>
+       <prompt>name of xmlrpc.php public XML-RPC frontend file</prompt>
+       <type>string</type>
+       <default>xmlrpc.php</default>
+      </param>
+      <param>
+       <name>frontendphp</name>
+       <prompt>name of frontend.php HTML admin frontend file</prompt>
+       <type>string</type>
+      </param>
+      <param>
+       <name>uploadpath</name>
+       <prompt>temporary path to save uploaded releases in</prompt>
+       <type>string</type>
+      </param>
+      <param>
+       <name>port</name>
+       <prompt>port clients should connect to (443 is SSL, 80 is regular HTTP)</prompt>
+       <type>string</type>
+       <default>80</default>
+      </param>
+      <param>
+       <name>ssl</name>
+       <prompt>protocol clients should use to connect (http or https)</prompt>
+       <type>string</type>
+       <default>http</default>
+      </param>
+     </paramgroup>
+    </tasks:postinstallscript>
+    <tasks:replace from="@data-dir@" to="data_dir" type="pear-config"/>
+    <tasks:replace from="@php-dir@" to="php_dir" type="pear-config"/>
+   </file>
+   <file baseinstalldir="Chiara/PEAR" md5sum="7220a34493aff628d8a365edeba36fb2" name="Server/Release.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="54d54f556d49362039630ed0d84afd46" name="Server.php" role="php"/>
+  </dir>
+ </contents>
+ <dependencies>
+  <required>
+   <php>
+    <min>5.0.0</min>
+   </php>
+   <pearinstaller>
+    <min>1.4.0a11</min>
+   </pearinstaller>
+   <package>
+    <name>DB_DataObject</name>
+    <channel>pear.php.net</channel>
+    <min>1.7.12</min>
+   </package>
+   <package>
+    <name>HTML_QuickForm</name>
+    <channel>pear.php.net</channel>
+    <min>3.2.2</min>
+   </package>
+   <package>
+    <name>Chiara_XML_RPC5</name>
+    <channel>pear.chiaraquartet.net</channel>
+   </package>
+  </required>
+  <optional>
+   <extension>
+    <name>xmlrpc</name>
+   </extension>
+  </optional>
+  <group hint="Public frontend for users to browse channel packages" name="pearweb">
+   <package>
+    <name>Crtx_PEAR_Channel_Frontend</name>
+    <channel>pear.crtx.org</channel>
+    <min>0.1.1</min>
+   </package>
+  </group>
+ </dependencies>
+ <phprelease/>
+ <changelog>
+  <release>
+   <version>
+    <release>0.1</release>
+    <api>0.1</api>
+   </version>
+   <stability>
+    <release>devel</release>
+    <api>devel</api>
+   </stability>
+   <date>2004-07-30</date>
+   <license uri="http://www.php.net/license/3_0.txt">PHP License</license>
+   <notes>Initial development release for testing purposes only</notes>
+  </release>
+  <release>
+   <version>
+    <release>0.2</release>
+    <api>0.2</api>
+   </version>
+   <stability>
+    <release>devel</release>
+    <api>devel</api>
+   </stability>
+   <date>2004-08-02</date>
+   <license uri="http://www.php.net/license/3_0.txt">PHP License</license>
+   <notes>Add new channel.listAll and channel.update methods</notes>
+  </release>
+  <release>
+   <version>
+    <release>0.3.0</release>
+    <api>0.3.0</api>
+   </version>
+   <stability>
+    <release>devel</release>
+    <api>devel</api>
+   </stability>
+   <date>2004-08-03</date>
+   <license uri="http://www.php.net/license/3_0.txt">PHP License</license>
+   <notes>Add xmlrpc dep</notes>
+  </release>
+  <release>
+   <version>
+    <release>0.4.0</release>
+    <api>0.4.0</api>
+   </version>
+   <stability>
+    <release>devel</release>
+    <api>devel</api>
+   </stability>
+   <date>2004-08-12</date>
+   <license uri="http://www.php.net/license/3_0.txt">PHP License</license>
+   <notes>Fix package.listAll to make up for pearweb kludge, fix package.getDownloadURL,
+fix package.info</notes>
+  </release>
+  <release>
+   <version>
+    <release>0.5.0</release>
+    <api>0.5.0</api>
+   </version>
+   <stability>
+    <release>devel</release>
+    <api>devel</api>
+   </stability>
+   <date>2004-08-13</date>
+   <license uri="http://www.php.net/license/3_0.txt">PHP License</license>
+   <notes>Fix issue with xml-rpc that borks XML_RPC package on client-side</notes>
+  </release>
+  <release>
+   <version>
+    <release>0.6.0</release>
+    <api>0.6.0</api>
+   </version>
+   <stability>
+    <release>devel</release>
+    <api>devel</api>
+   </stability>
+   <date>2004-08-17</date>
+   <license uri="http://www.php.net/license/3_0.txt">PHP License</license>
+   <notes>update for new version of PEAR</notes>
+  </release>
+  <release>
+   <version>
+    <release>0.7.0</release>
+    <api>0.7.0</api>
+   </version>
+   <stability>
+    <release>devel</release>
+    <api>devel</api>
+   </stability>
+   <date>2004-10-01</date>
+   <license uri="http://www.php.net/license/3_0.txt">PHP License</license>
+   <notes>update for new version of PEAR - complete rewrite, must be installed from scratch</notes>
+  </release>
+  <release>
+   <version>
+    <release>0.8.0</release>
+    <api>0.8.0</api>
+   </version>
+   <stability>
+    <release>devel</release>
+    <api>devel</api>
+   </stability>
+   <date>2005-02-14</date>
+   <license uri="http://www.php.net/license/3_0.txt">PHP License</license>
+   <notes>rewrite to work with PEAR 1.4.0a1, must be installed from scratch</notes>
+  </release>
+  <release>
+   <version>
+    <release>0.9.0</release>
+    <api>0.9.0</api>
+   </version>
+   <stability>
+    <release>devel</release>
+    <api>devel</api>
+   </stability>
+   <date>2005-02-14</date>
+   <license uri="http://www.php.net/license/3_0.txt">PHP License</license>
+   <notes>Add new XMLRPC5 frontend for those without xmlrpc extension</notes>
+  </release>
+  <release>
+   <version>
+    <release>0.10.0</release>
+    <api>0.10.0</api>
+   </version>
+   <stability>
+    <release>devel</release>
+    <api>devel</api>
+   </stability>
+   <date>2005-02-17</date>
+   <license uri="http://www.php.net/license/3_0.txt">PHP License</license>
+   <notes>Fix problems in mysqlinstall.php post-install script</notes>
+  </release>
+  <release>
+   <version>
+    <release>0.11.0</release>
+    <api>0.11.0</api>
+   </version>
+   <stability>
+    <release>devel</release>
+    <api>devel</api>
+   </stability>
+   <date>2005-02-17</date>
+   <license uri="http://www.php.net/license/3_0.txt">PHP License</license>
+   <notes>Fix package.info</notes>
+  </release>
+  <release>
+   <version>
+    <release>0.12.0</release>
+    <api>0.12.0</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2005-02-17</date>
+   <license uri="http://www.php.net/license/3_0.txt">PHP License</license>
+   <notes>Fix package.listLatestReleases</notes>
+  </release>
+  <release>
+   <version>
+    <release>0.13.0</release>
+    <api>0.13.0</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2005-03-12</date>
+   <license uri="http://www.php.net/license">PHP License</license>
+   <notes>* Added Category support
+- Added Table categories
+- Added Server\Backend\DBDataObject\Categories.php
+- Added necessary exceptions
+- Modified Server\Frontend\HTML_QuickForm.php (added forms for above)
+
+* Added support for external CVS/Bugs/Documentation
+- Added Table package_extras
+- Added Server\Backend\DBDataObject\Package_extras.php
+
+* Added a real layout
+- Added data\pear_server.css
+
+* Now allows input of license_uri
+* Now allows input of new maintainer password
+* Fixed bug with Parent Packages
+* Added URI field for Maintainers</notes>
+  </release>
+  <release>
+   <version>
+    <release>0.14.0</release>
+    <api>0.13.0</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2005-03-17</date>
+   <license uri="http://www.php.net/license">PHP License</license>
+   <notes>add check for weird addslashes/stripslashes behavior that seems to vary from system to system
+    add exception for invalid release upload
+    API is unchanged in this release</notes>
+  </release>
+  <release>
+   <version>
+    <release>0.15.0</release>
+    <api>0.13.0</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2005-03-21</date>
+   <license uri="http://www.php.net/license">PHP License</license>
+   <notes>* fix package.getDownloadURL and package.getDepDownloadURL when a different case is
+      passed in (smarty as opposed to Smarty)
+    * fix duplicate names listing for multiple leads in DBDataObject-&gt;listPackageMaintainers()
+    API is unchanged in this release</notes>
+  </release>
+  <release>
+   <version>
+    <release>0.16.0</release>
+    <api>0.16.0</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2005-03-24</date>
+   <license uri="http://www.php.net/license">PHP License</license>
+   <notes>* implement package.getDownloadURL and package.getDepDownloadURL 1.1</notes>
+  </release>
+  <release>
+   <version>
+    <release>0.17.0</release>
+    <api>0.17.0</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2005-03-24</date>
+   <license uri="http://www.php.net/license">PHP License</license>
+   <notes>Implement ssl, port, path options for channel server connection and xmlrpc.php file name</notes>
+  </release>
+ </changelog>
+</package>
