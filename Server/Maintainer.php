@@ -7,6 +7,9 @@ class Chiara_PEAR_Server_Maintainer implements Iterator
         'email' => '',
         'uri' => '',
         'password' => '',
+        'wishlist' => '',
+        'description' => '',
+        'admin' => '',
     );
 
     function rewind() {

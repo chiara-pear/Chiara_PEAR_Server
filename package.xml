@@ -29,9 +29,9 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
   <active>yes</active>
  </lead>
  <date>2006-04-09</date>
- <time>16:18:10</time>
+ <time>22:43:11</time>
  <version>
-  <release>0.18.5</release>
+  <release>0.18.6</release>
   <api>0.18.0</api>
  </version>
  <stability>
@@ -39,17 +39,17 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
   <api>alpha</api>
  </stability>
  <license uri="http://www.php.net/license">PHP License</license>
- <notes>* fix post-install script so it is never possible to delete an
-  existing channel database
-* fix data structure of package_extras table so we can update it
-* when setting up 2 channels in the same database, the administrator of an existing
-  channel is mistakenly used for the new channel as well in the post-install script</notes>
+ <notes>* security fix: if a site has 2 channels, it was possible for
+  a user to log into the other channel with the same username without
+  verification</notes>
  <contents>
   <dir baseinstalldir="Chiara/PEAR" name="/">
    <file baseinstalldir="Chiara/PEAR" md5sum="25731be0a687a8b1c13311953d02495d" name="data/DBDataObject/pearserver.ini" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="9245dd65f9a98d7e372736b5f7f428a9" name="data/deprecatedpackages-chiara_pear_server-0.17.0.sql" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="854d541ec870d5b0f9a2860a08972849" name="data/handles-channel-0.18.2.sql" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="d191a3016b4af8825c5e4a6b76854fb7" name="data/maintainer-0.19.0.sql" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="b074733015dd02b1d36cc67694206e26" name="data/maintainers-channel-0.18.4.sql" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="c082d3730bef05db9d0710945a6c03fd" name="data/package_extras-0.19.0.sql" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="fbdba6061dc6306c4ab6ba6abd12fe64" name="data/package_extras_fixvalues-0.18.5.sql" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="7e6a2d0b26f6d58eeaeff2503e551b9c" name="data/package_extras_keys-0.18.5.sql" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="880601a28c6cc98a38a363554ff24e3d" name="data/package_extras_missingvalues-0.18.5.sql" role="data"/>
@@ -60,20 +60,20 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
    <file baseinstalldir="Chiara/PEAR" md5sum="4110a5fe9147a91cf149c1535186e9c6" name="examples/xmlrpc.php" role="doc"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="1db94913761d31de34b7dfd5449c4fb5" name="Server/Backend/DBDataObject/Categories.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="30efeea0aae2b9b992cbffa1b29e0848" name="Server/Backend/DBDataObject/Channels.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="62e904297a241f7e9642e435a247e682" name="Server/Backend/DBDataObject/Handles.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="e26fa46a8811319c6b44a11cee66bce3" name="Server/Backend/DBDataObject/Handles.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="1e388122551a3d5ab18942ea20f66cf9" name="Server/Backend/DBDataObject/Maintainers.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="06d90ce23030bb8035bfd2d9971042d9" name="Server/Backend/DBDataObject/Packages.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="7a9bc94e801468b1825986c62f8ab850" name="Server/Backend/DBDataObject/Package_extras.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="fdbd3dbc58cf9f332d0512a590fbb125" name="Server/Backend/DBDataObject/Package_extras.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="041e1eeef782fa9000772f3bece2775a" name="Server/Backend/DBDataObject/Releases.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="488e52dc1d69309bf4c0fadc43313859" name="Server/Backend/DBDataObject.php" role="php">
     <tasks:replace from="@php-dir@" to="php_dir" type="pear-config"/>
     <tasks:replace from="@data-dir@" to="data_dir" type="pear-config"/>
    </file>
-   <file baseinstalldir="Chiara/PEAR" md5sum="7be3af5b00b33f009009a46b8c914273" name="Server/Frontend/HTMLQuickForm.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="bfb0a0a1739af2ec8f26edab9e557294" name="Server/Frontend/HTMLQuickForm.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="bfd4a2c606e4bf8e8d9dedcc308f5bca" name="Server/Backend.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="780235e3880066986a30fdeea8f52d9c" name="Server/Exception.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="e7c92c79ed7d708a2e67b66dbdb62daf" name="Server/Frontend.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="b45466760ee1535b6fde965bd4ca3c84" name="Server/Maintainer.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="dc6ac839a9504dab4dee976cbd349069" name="Server/Maintainer.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="af8efd8cefb0b3cb5631da677a2e156e" name="Server/mysqlinstall.php" role="php">
     <tasks:replace from="@php-dir@" to="php_dir" type="pear-config"/>
     <tasks:replace from="@data-dir@" to="data_dir" type="pear-config"/>
@@ -566,6 +566,21 @@ fix invalid release exception error message</notes>
 * fix data structure of package_extras table so we can update it
 * when setting up 2 channels in the same database, the administrator of an existing
   channel is mistakenly used for the new channel as well in the post-install script</notes>
+  </release>
+  <release>
+   <version>
+    <release>0.18.6</release>
+    <api>0.18.0</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2006-04-09</date>
+   <license uri="http://www.php.net/license">PHP License</license>
+   <notes>* security fix: if a site has 2 channels, it was possible for
+  a user to log into the other channel with the same username without
+  verification</notes>
   </release>
  </changelog>
 </package>

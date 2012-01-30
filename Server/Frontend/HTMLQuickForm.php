@@ -24,15 +24,15 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
     {
         session_start();
         if (session_is_registered('_currentUser')) {
-            $this->_user = $_SESSION['_currentUser'];
-            $this->_admin = $_SESSION['_currentUserAdmin'];
+            $this->_user = $_SESSION['_currentUser'][$this->_channel];
+            $this->_admin = $_SESSION['_currentUserAdmin'][$this->_channel];
         } else {
             $this->_user = false;
             $this->_admin = false;
             session_register('_currentUser');
             session_register('_currentUserAdmin');
-            $_SESSION['_currentUser'] = false;
-            $_SESSION['_currentUserAdmin'] = false;
+            $_SESSION['_currentUser'][$this->_channel] = false;
+            $_SESSION['_currentUserAdmin'][$this->_channel] = false;
         }
     }
 
@@ -44,6 +44,7 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
         $this->_server->addMethodIndex('addMaintainer');
         $this->_server->addMethodIndex('managePackageMaintainers');
         $this->_server->addMethodIndex('login');
+        $this->_server->addMethodIndex('myAccount');
     }
 
     /**
@@ -107,6 +108,9 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
             case 'addPackage' :
                 $this->doMainMenu('doAddPackage', $func);
             break;
+            case "myAccount" :
+                $this->doMainMenu('doMyAccount', $func);
+                break;
             case 'listPackages' :
             case 'listReleases' :
             case 'listLatestReleases' :
@@ -130,7 +134,7 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
                 if ($this->_backend->validLogin(
                 trim(strtolower($this->_quickForm->getSubmitValue('user'))),
                 trim($this->_quickForm->getSubmitValue('password')))) {
-                    $_SESSION['_currentUser'] = trim(strtolower($this->_quickForm->getSubmitValue('user')));
+                    $_SESSION['_currentUser'][$this->_channel] = trim(strtolower($this->_quickForm->getSubmitValue('user')));
                     session_write_close();
                     $this->_user = trim(strtolower($this->_quickForm->getSubmitValue('user')));
                     if ($this->_backend->isAdmin($this->_user)) {
@@ -138,7 +142,7 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
                     } else {
                         $this->_admin = false;
                     }
-                    $_SESSION['_currentUserAdmin'] = $this->_admin;
+                    $_SESSION['_currentUserAdmin'][$this->_channel] = $this->_admin;
                     header('Location: ' .$this->_index);
                     return true;
                 } else {
@@ -177,7 +181,7 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
         }
         ?>
         </p>
-        <?php            
+        <?php
     }
 
     public function doMainMenu($menu, $func, $param = null)
@@ -199,7 +203,7 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
                     if ($this->_user) {
                             ?>
                     <p>
-                        Logged in as <strong><?php echo $this->_user; ?></strong> | <a href="<?php echo $this->_index; ?>?logout=1">Logout</a> <br /> Managing Channel<strong> <a href="http://<?php
+                        Logged in as <strong><?php echo $this->_user; ?></strong> | <a href="<?php echo $this->_index; ?>?f=<?php echo $this->_server->getMethodIndex('myAccount'); ?>">My Account</a> | <a href="<?php echo $this->_index; ?>?logout=1">Logout</a> <br /> Managing Channel<strong> <a href="http://<?php
                         echo $this->_channel; ?>"><?php echo $this->_channel; ?></a></strong>
                     </p>
                             <?php
@@ -457,6 +461,19 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
 
     public function doManageCategory($fn, $category)
     {
+        if ($category == "Default") {
+            $defaults = array("channel" => $this->_channel, "name" => "Default", "description" => "System Default Category. This Category cannot be edited.", "alias" => "");
+            $this->_quickForm->setDefaults($defaults);
+            $this->_quickForm->setConstants(array('managecategory' => "Default"));
+            $this->_quickForm->addElement('header', '', 'Category Information');
+            $this->_quickForm->addElement('static', 'channel', 'Channel');
+            $this->_quickForm->addElement('static', 'name', 'Name');
+            $this->_quickForm->addElement('static', 'description', 'Description');
+            $this->_quickForm->addElement('hidden', 'f', 'f');
+            $this->_quickForm->addElement('hidden', 'managecategory', "Manage Category");
+            echo $this->_quickForm->toHtml();
+            return;
+        }
         try {
             if (isset($_REQUEST['deleteCategory'])) {
                 if (!$this->_backend->deleteCategory($category)) {
@@ -491,7 +508,7 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
             $this->_quickForm->addElement('static', 'channel', 'Channel');
             $this->_quickForm->addElement('text', 'name', 'Name');
             $this->_quickForm->addElement('text', 'description', 'Description');
-            $this->_quickForm->addElement('text', 'alias', 'Summary');
+            $this->_quickForm->addElement('text', 'alias', 'Alias');
             $this->_quickForm->addElement('hidden', 'f', 'f');
             $this->_quickForm->addElement('hidden', 'managecategory', "Manage Category");
             $this->_quickForm->addElement('submit', 'submitted', 'Save Changes');
@@ -646,9 +663,51 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
             $this->_quickForm->addElement('hidden', 'f', 'License');
             $this->_quickForm->addElement('hidden', 'managemaintainer', 'License');
             $this->_quickForm->addElement('text', 'email', 'Email', array('size' => 40));
+            $this->_quickForm->addElement('checkbox', 'admin', 'Channel Administrator');
             $this->_quickForm->addElement('submit', 'submitted', 'Save Changes');
             $this->_quickForm->addRule('name', 'Required', 'required');
             $this->_quickForm->addRule('email', 'Required', 'required');
+            echo $this->_quickForm->toHtml();
+        } catch (Chiara_PEAR_Server_Exception $e) {
+            echo "<strong>Error</strong> " . $e->getMessage();
+        }
+    }
+
+    public function doMyAccount($fn)
+    {
+        try {
+            $info = $this->_backend->getMaintainer($_SESSION['_currentUser']);
+            if (isset($_REQUEST['submitted'])) {
+                if ($this->_quickForm->validate()) {
+                    $stuff = $this->_quickForm->getSubmitValues();
+                    foreach ($stuff as $name => $value) {
+                        $info->$name = $value;
+                    }
+                    $this->_backend->updateMaintainer($info);
+                    $this->_quickForm->addElement('header', '', 'Data Saved');
+                }
+            }
+            $defaults = $info->toArray();
+            $defaults['managemaintainer'] = $info->handle;
+            $defaults['password'] = "";
+            $defaults['f'] = $_REQUEST['f'];
+            $this->_quickForm->setDefaults($defaults);
+            $this->_quickForm->addElement('header', '', 'My Account');
+            $this->_quickForm->addElement('static', 'handle', 'Handle');
+            $this->_quickForm->addElement('text', 'name', 'Name', array('size' => 40));
+            $this->_quickForm->addElement('hidden', 'f', 'myAccount');
+            $this->_quickForm->addElement('hidden', 'myaccount', 'License');
+            $this->_quickForm->addElement('text', 'email', 'Email', array('size' => 40));
+            $this->_quickForm->addElement('text', 'uri', 'Website', array('size' => 40));
+            $this->_quickForm->addElement('text', 'wishlist', 'Wishlist', array('size' => 40));
+            $this->_quickForm->addElement('textarea', 'description', 'About', array('cols' => 40, "rows" => 15));
+            $this->_quickForm->addElement('password', 'password', 'Password');
+            $this->_quickForm->addElement('password', 'confirm_password', 'Confirm Password');
+            $this->_quickForm->addRule('password', 'Password must be at least 6 characters long', 'minlength', 6, 'client');
+            $this->_quickForm->addRule(array('password', 'confirm_password'), "The passwords do not match", 'compare', null, 'client');
+            $this->_quickForm->addElement('submit', 'submitted', 'Save Changes');
+            $this->_quickForm->addRule('name', 'Name Required', 'required', null, 'client');
+            $this->_quickForm->addRule('email', 'E-Mail Required', 'required', null, 'client');
             echo $this->_quickForm->toHtml();
         } catch (Chiara_PEAR_Server_Exception $e) {
             echo "<strong>Error</strong> " . $e->getMessage();

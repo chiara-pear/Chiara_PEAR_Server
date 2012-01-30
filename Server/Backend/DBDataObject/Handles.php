@@ -4,7 +4,7 @@
  */
 require_once 'DB/DataObject.php';
 
-class Chiara_PEAR_Server_Backend_DBDataObject_Handles extends DB_DataObject 
+class Chiara_PEAR_Server_Backend_DBDataObject_Handles extends DB_DataObject
 {
     ###START_AUTOCODE
     /* the code below is auto generated do not remove the above tag */
@@ -15,6 +15,8 @@ class Chiara_PEAR_Server_Backend_DBDataObject_Handles extends DB_DataObject
     public $name;                            // string(255)  not_null
     public $email;                           // string(255)  not_null
     public $uri;                             // string(255)  not_null
+    public $wishlist;                        // string(255)  not_null
+    public $description;                     // string(255) not_null
     public $password;                        // string(50)  not_null
     public $admin;                           // int(11)  not_null
 
