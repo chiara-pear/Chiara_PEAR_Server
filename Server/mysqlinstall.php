@@ -236,7 +236,7 @@ class Server_mysqlinstall_postinstall
                 }
             }
             if ($query) {
-                $this->_ui->outputData('Upgrading tables succeeded');
+                $this->_ui->outputData('Updating database succeeded');
                 return true;
             } else {
                 if (extension_loaded('mysqli')) {
@@ -244,11 +244,11 @@ class Server_mysqlinstall_postinstall
                 } else {
                     $this->_ui->outputData(mysql_error());
                 }
-                $this->_ui->outputData('Upgrading tables failed');
+                $this->_ui->outputData('Updating database failed');
                 return false;
             }
         } else {
-            $this->_ui->outputData('Could not open the sql for table upgrade');
+            $this->_ui->outputData('Could not open the sql for database update');
             return false;
         }
     }
@@ -406,10 +406,25 @@ class Server_mysqlinstall_postinstall
                 }
             }
         }
+        // Check to see if given database already exists
+        // FIXME: This sequence needs to be re-worked in the switch to DB or MDB2 usage
+        // to avoid the double *select_db calls.
         if (extension_loaded('mysqli')) {
-            $query = mysqli_query($conn, 'CREATE DATABASE ' . $answers['database']);
+            $query = mysqli_select_db($conn, $answers['database']);
+            if (!$query) {
+                $query = mysqli_query($conn, 'CREATE DATABASE ' . $answers['database']);
+                if ($query) {
+                    $query = mysqli_select_db($conn, $answers['database']);
+                }
+            }
         } else {
-            $query = mysql_query('CREATE DATABASE ' . $answers['database'], $conn);
+            $query = mysql_select_db($answers['database'], $conn);
+            if (!$query) {
+                $query = mysql_query('CREATE DATABASE ' . $answers['database'], $conn);
+                if ($query) {
+                    $query = mysql_select_db($answers['database'], $conn);
+                }
+            }
         }
         if ($query) {
             if (extension_loaded('mysqli')) {
@@ -418,8 +433,8 @@ class Server_mysqlinstall_postinstall
                 $query = mysql_select_db($answers['database'], $conn);
             }
             if ($query) {
-                $a = $this->updateDatabase('@data-dir@/Chiara_PEAR_Server/data/pearserver.sql', false,
-                    $conn);
+                $a = $this->updateDatabase('@data-dir@/Chiara_PEAR_Server/data/pearserver.sql',
+                    'Creating Chiara_PEAR_Server database structure...', $conn);
                 if (!$a) {
                     $this->closeDB($conn);
                     return false;

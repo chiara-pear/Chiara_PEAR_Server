@@ -28,10 +28,10 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
   <email>clay@killersoft.com</email>
   <active>yes</active>
  </lead>
- <date>2005-10-03</date>
- <time>18:22:17</time>
+ <date>2005-10-04</date>
+ <time>23:47:33</time>
  <version>
-  <release>0.18.2</release>
+  <release>0.18.3</release>
   <api>0.18.0</api>
  </version>
  <stability>
@@ -39,10 +39,7 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
   <api>alpha</api>
  </stability>
  <license uri="http://www.php.net/license">PHP License</license>
- <notes>* Fixes bug which prevented non-admin leads from releasing.
-* Adds support for groupings of user handles by channel
-* Fixes bug relating to DB_DataObject configuration when channel database 
-  name is not the default.</notes>
+ <notes>* Fix fatal error in post-install script.</notes>
  <contents>
   <dir baseinstalldir="Chiara/PEAR" name="/">
    <file baseinstalldir="Chiara/PEAR" md5sum="9c03de64449ab09c4c031cce668435d8" name="data/DBDataObject/pearserver.ini" role="data"/>
@@ -69,7 +66,7 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
    <file baseinstalldir="Chiara/PEAR" md5sum="c5409863a5409f9a347a5be74102dcb8" name="Server/Exception.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="e7c92c79ed7d708a2e67b66dbdb62daf" name="Server/Frontend.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="b45466760ee1535b6fde965bd4ca3c84" name="Server/Maintainer.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="d42fda24093f6b96c6e7797328b132bc" name="Server/mysqlinstall.php" role="php">
+   <file baseinstalldir="Chiara/PEAR" md5sum="311846ac291b1d7c2f51bd42eabc31ed" name="Server/mysqlinstall.php" role="php">
     <tasks:replace from="@php-dir@" to="php_dir" type="pear-config"/>
     <tasks:replace from="@data-dir@" to="data_dir" type="pear-config"/>
     <tasks:postinstallscript>
@@ -506,12 +503,28 @@ fix invalid release exception error message</notes>
     <release>alpha</release>
     <api>alpha</api>
    </stability>
-   <date>2005-10-02</date>
+   <date>2005-10-04</date>
    <license>PHP License</license>
    <notes>* Fixes bug which prevented non-admin leads from releasing.
 * Adds support for groupings of user handles by channel
 * Fixes bug relating to DB_DataObject configuration when channel database 
-  name is not the default.</notes>
+  name is not the default.
+* Minor revisions for clarity in install/update messages
+* Check to see if specified database exists before attempting to create it
+  on first-time installations.</notes>
+  </release>
+  <release>
+   <version>
+    <release>0.18.3</release>
+    <api>0.18.0</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2005-10-04</date>
+   <license>PHP License</license>
+   <notes>* Fix fatal error in post-install script.</notes>
   </release>
  </changelog>
 </package>
