@@ -1,5 +1,6 @@
 <?php
 require_once 'Chiara/PEAR/Server/Maintainer.php';
+require_once 'Chiara/PEAR/Server/REST.php';
 /**
  * Base class for all backends.
  * @author Gregory Beaver <cellog@php.net>
@@ -7,7 +8,7 @@ require_once 'Chiara/PEAR/Server/Maintainer.php';
 abstract class Chiara_PEAR_Server_Backend
 {
     protected $_channel;
-    protected $_restdir;
+    protected $_rest;
 
     /**
      * @param string channel server
@@ -16,7 +17,7 @@ abstract class Chiara_PEAR_Server_Backend
     public function __construct($channel, $restdir)
     {
         $this->_channel = $channel;
-        $this->_restdir = $restdir;
+        $this->_rest = new Chiara_PEAR_Server_REST($this, $restdir);
     }
 
     /**
@@ -39,33 +40,110 @@ abstract class Chiara_PEAR_Server_Backend
      * @param string
      * @param string
      */
-    abstract public function saveReleaseREST($package, $version);
+    public function saveReleaseREST($package, $version)
+    {
+        return $this->_rest->saveReleaseREST($package, $version);
+    }
 
     /**
      * @param string
      */
-    abstract public function saveAllReleasesREST($package);
+    public function saveAllReleasesREST($package)
+    {
+        return $this->_rest->saveAllReleasesREST($package);
+    }
 
     /**
      * @param string
      */
-    abstract public function savePackageREST($package);
+    public function savePackageREST($package)
+    {
+        return $this->_rest->savePackageREST($package);
+    }
 
     /**
      * @param string
      * @param string
      */
-    abstract public function deletePackageREST($package, $category);
+    public function deletePackageREST($package, $category)
+    {
+        return $this->_rest->deletePackageREST($package, $category);
+    }
 
     /**
      * @param string
      */
-    abstract public function saveCategoryREST($category);
+    public function saveCategoryREST($category)
+    {
+        return $this->_rest->saveCategoryREST($category);
+    }
+
+    public function saveAllCategoriesREST()
+    {
+        return $this->_rest->saveAllCategoriesREST();
+    }
 
     /**
      * @param string
      */
-    abstract public function deleteCategoryREST($category);
+    public function savePackagesCategoryREST($category)
+    {
+        return $this->_rest->savePackagesCategoryREST($category);
+    }
+
+    /**
+     * @param string
+     */
+    public function deleteCategoryREST($category)
+    {
+        return $this->_rest->deleteCategoryREST($category);
+    }
+
+    public function saveAllPackagesREST()
+    {
+        return $this->_rest->saveAllPackagesREST();
+    }
+
+    /**
+     * Serialize dependencies REST for a release
+     *
+     * @param string $package
+     * @param string $version
+     * @param array $deps
+     */
+    public function savePackageDepsREST($package, $version, $deps)
+    {
+        return $this->_rest->savePackageDepsREST($package, $version, $deps);
+    }
+
+    public function savePackageMaintainersREST($package)
+    {
+        return $this->_rest->savePackageMaintainersREST($package);
+    }
+
+    /**
+     * @param string
+     * @param string
+     */
+    public function deleteReleaseREST($package, $version)
+    {
+        return $this->_rest->deleteReleaseREST($package, $version);
+    }
+
+    public function saveAllMaintainersREST()
+    {
+        return $this->_rest->saveAllMaintainersREST();
+    }
+
+    public function saveMaintainerREST(Chiara_PEAR_Server_Maintainer $maintainer)
+    {
+        return $this->_rest->saveMaintainerREST($maintainer);
+    }
+
+    public function deleteMaintainerREST(Chiara_PEAR_Server_Maintainer $maintainer)
+    {
+        return $this->_rest->deleteMaintainerREST($maintainer);
+    }
 
     /**
      * @param string
@@ -73,11 +151,6 @@ abstract class Chiara_PEAR_Server_Backend
      */
     abstract public function deleteRelease($packagename, $version);
 
-    /**
-     * @param string
-     * @param string
-     */
-    abstract public function deleteReleaseREST($packagename, $version);
 
     /**
      * @param string
@@ -212,6 +285,8 @@ abstract class Chiara_PEAR_Server_Backend
      * @return mixed
      */
     abstract public function packageInfo($package, $key = null);
+    
+    abstract public function packageExists($package);
 
     abstract public function addMaintainer(Chiara_PEAR_Server_Maintainer $maintainer);
 

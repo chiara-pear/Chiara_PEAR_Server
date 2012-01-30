@@ -1,5 +1,7 @@
 # Database : pearserver
 # --------------------------------------------------------
+# $Id: pearserver.sql,v 1.12 2006/02/04 02:55:09 cellog Exp $
+# --------------------------------------------------------
 
 #
 # Table structure for table `categories`
@@ -30,7 +32,7 @@ CREATE TABLE categories_seq (
 #
 
 CREATE TABLE channels (
-  channel varchar(100) NOT NULL default '',
+  channel varchar(255) NOT NULL default '',
   summary varchar(255) NOT NULL default '',
   alias varchar(100) NOT NULL default '',
   rest_support int(6) NOT NULL default '0',
@@ -45,12 +47,14 @@ CREATE TABLE channels (
 #
 
 CREATE TABLE handles (
-  channel varchar(100) NOT NULL default '',
+  channel varchar(255) NOT NULL default '',
   handle varchar(20) NOT NULL default '',
   name varchar(255) NOT NULL default '',
   email varchar(255) NOT NULL default '',
-  uri varchar(255) NOT NULL default '',
-  password varchar(50) NOT NULL default '',
+  uri varchar(255) default NULL,
+  description text,
+  wishlist text,
+  `password` varchar(50) NOT NULL default '',
   admin int(11) NOT NULL default '0',
   PRIMARY KEY  (channel,handle)
 );
@@ -62,7 +66,7 @@ CREATE TABLE handles (
 
 CREATE TABLE maintainers (
   handle varchar(20) NOT NULL default '',
-  channel varchar(25) NOT NULL default '',
+  channel varchar(255) NOT NULL default '',
   package varchar(80) NOT NULL default '',
   role varchar(30) NOT NULL default 'lead',
   active tinyint(4) NOT NULL default '1',
@@ -79,7 +83,9 @@ CREATE TABLE package_extras (
   package varchar(80) default NULL,
   cvs_uri varchar(255) NOT NULL default '',
   bugs_uri varchar(255) NOT NULL default '',
-  docs_uri varchar(255) NOT NULL default ''
+  docs_uri varchar(255) NOT NULL default '',
+  qa_approval int(1) default NULL,
+  unit_tested int(1) default NULL
 );
 # --------------------------------------------------------
 
@@ -108,7 +114,7 @@ CREATE TABLE packages (
 
 CREATE TABLE releases (
   id int(11) NOT NULL default '0',
-  channel varchar(25) NOT NULL default '',
+  channel varchar(255) NOT NULL default '',
   package varchar(80) NOT NULL default '',
   version varchar(20) NOT NULL default '',
   state enum('stable','beta','alpha','devel','snapshot') NOT NULL default 'stable',

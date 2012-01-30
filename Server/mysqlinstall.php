@@ -313,6 +313,38 @@ class Server_mysqlinstall_postinstall
                         }
                         $this->fixHandles = true;
                     }
+                    // channel field size upgrade
+                    if (extension_loaded('mysqli')) {
+                        $query = @mysqli_query($conn, 'SHOW COLUMNS FROM maintainers');
+                        while ($res = mysqli_fetch_array($query, MYSQLI_ASSOC)) {
+                            if ($res['Field'] == 'channel') {
+                                if ($res['Type'] == 'varchar(255)') {
+                                    $upgraded = true;
+                                } else {
+                                    $upgraded = false;
+                                }
+                            }
+                        }
+                    } else {
+                        $query = @mysql_query('SHOW COLUMNS FROM maintainers', $conn);
+                        while ($res = mysql_fetch_array($query, MYSQLI_ASSOC)) {
+                            if ($res['Field'] == 'channel') {
+                                if ($res['Type'] == 'varchar(255)') {
+                                    $upgraded = true;
+                                } else {
+                                    $upgraded = false;
+                                }
+                            }
+                        }
+                    }
+                    if (!$upgraded) {
+                        $a = $this->updateDatabase(
+                            '@data-dir@/Chiara_PEAR_Server/data/maintainers-channel-0.18.4.sql',
+                            'updating database to increase size of channel field', $conn);
+                        if (!$a) {
+                            return $a;
+                        }
+                    }
                     // REST support upgrade
                     if (extension_loaded('mysqli')) {
                         $query = @mysqli_query($conn, 'SELECT rest_support FROM channels');
@@ -720,10 +752,11 @@ $server->run();
         }
         $chan->rest_support = 1;
         $chan->update();
-        $this->_ui->outputData('Adding REST 1.0 to channel.xml');
+        $this->_ui->outputData('Adding REST 1.0 and REST 1.1 to channel.xml');
         $chan = $this->_registry->getChannel($this->channel);
         if (is_a($chan, 'PEAR_ChannelFile')) {
             $chan->setBaseURL('REST1.0', 'http://' . $this->channel . '/Chiara_PEAR_Server_REST/');
+            $chan->setBaseURL('REST1.1', 'http://' . $this->channel . '/Chiara_PEAR_Server_REST/');
             $this->_registry->updateChannel($chan);
             file_put_contents($this->webroot . DIRECTORY_SEPARATOR . 'channel.xml',
                 $chan->toXml());
@@ -754,6 +787,9 @@ $server->run();
             $this->_ui->outputData('  Category ' . $category['name']);
             $backend->saveCategoryREST($category['name']);
         }
+        $backend->saveAllCategoriesREST();
+        $this->_ui->outputData("Saving All Maintainers REST");
+        $backend->saveAllMaintainersREST();
         $this->_ui->outputData('Saving Maintainer REST');
         $maintainers = $backend->listMaintainers();
         foreach ($maintainers as $maintainer) {
@@ -766,9 +802,11 @@ $server->run();
         foreach ($packages as $package) {
             $this->_ui->outputData('  Package ' . $package['package']);
             $backend->savePackageREST($package['package']);
+            $this->_ui->outputData('    Maintainers...');
             $backend->savePackageMaintainersREST($package['package']);
             $releases = $backend->listReleases($package['package']);
             if (count($releases)) {
+                $this->_ui->outputData('    Processing releases');
                 $backend->saveAllReleasesREST($package['package']);
                 foreach ($releases as $version => $release) {
                     $this->_ui->outputData('     Version ' . $version);
@@ -778,6 +816,11 @@ $server->run();
                         $version)->getDependencies());
                 }
             }
+        }
+        $this->_ui->outputData("Saving Category Package REST");
+        foreach ($backend->listCategories() as $category) {
+            $this->_ui->outputData("  $category[name]");
+            $backend->savePackagesCategoryREST($category['name']);
         }
     }
 }

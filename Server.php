@@ -232,9 +232,9 @@ class Chiara_PEAR_Server
                     }
                 }
                 if ($found) {
-                    return 
+                    return
                         $this->_output->funcReturn(array('version' => $ver,
-                              'info' => $this->_backend[$channel]->getPackagexml($package, $ver), 
+                              'info' => $this->_backend[$channel]->getPackagexml($package, $ver),
                               'url' => $ret . $ver),
                               __CLASS__, __FUNCTION__);
                 } else {
@@ -321,7 +321,7 @@ class Chiara_PEAR_Server
                             if (!in_array($release['state'], $states)) {
                                 // the stability is too low, but we must return the
                                 // recommended version if possible
-                                return 
+                                return
                                     $this->_output->funcReturn(array('version' => $ver,
                                           'info' => $this->_backend[$channel]->getPackagexml($package, $ver)),
                                           __CLASS__, __FUNCTION__);
@@ -343,15 +343,15 @@ class Chiara_PEAR_Server
                     }
                 }
                 if ($found) {
-                    return 
+                    return
                         $this->_output->funcReturn(array('version' => $ver,
-                              'info' => $this->_backend[$channel]->getPackagexml($package, $ver), 
+                              'info' => $this->_backend[$channel]->getPackagexml($package, $ver),
                               'url' => $ret . $ver),
                               __CLASS__, __FUNCTION__);
                 } else {
                     reset($info);
                     list($ver, $release) = each($info);
-                    return 
+                    return
                         $this->_output->funcReturn(array('version' => $ver,
                               'info' => $this->_backend[$channel]->getPackagexml($package, $ver)),
                               __CLASS__, __FUNCTION__);
@@ -483,7 +483,7 @@ class Chiara_PEAR_Server
             $packages = $this->_backend[$channel]->listPackages(true, $state == 'stable');
             $ret = array();
             foreach ($packages as $package) {
-                $release = array_shift($this->_backend[$channel]->listReleases(
+                $release = array_shift($a = $this->_backend[$channel]->listReleases(
                     $package['package'], $state == 'stable'));
                 $release['deps'] = unserialize($release['deps']);
                 $release['filesize'] = $this->_backend[$channel]->getFileSize(

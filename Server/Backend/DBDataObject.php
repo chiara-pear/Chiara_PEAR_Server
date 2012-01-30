@@ -3,7 +3,7 @@ require_once 'DB/DataObject.php';
 require_once 'Chiara/PEAR/Server/Backend.php';
 require_once 'Chiara/PEAR/Server/Exception.php';
 /**
- * @version $Id: DBDataObject.php,v 1.46 2005/10/01 23:06:57 cellog Exp $
+ * @version $Id: DBDataObject.php,v 1.51 2005/11/12 17:45:39 cellog Exp $
  * @author Greg Beaver <cellog@php.net>
  */
 class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
@@ -196,301 +196,6 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
         return $ret;
     }
 
-    public function savePackageDepsREST($package, $version, $deps)
-    {
-        $channel = DB_DataObject::factory('channels');
-        $channel->channel = $this->_channel;
-        $channel->find(true);
-        if ($channel->rest_support) {
-            $channelinfo = parse_url($this->_channel);
-            if (isset($channelinfo['host'])) {
-                $extra = $channelinfo['path'] . '/Chiara_PEAR_Server_REST/';
-            } else {
-                $extra = '/Chiara_PEAR_Server_REST/';
-            }
-            $rdir = $this->_restdir . DIRECTORY_SEPARATOR . 'r';
-            if (!file_exists($rdir . DIRECTORY_SEPARATOR . strtolower($package))) {
-                System::mkdir(array('-p', $rdir . DIRECTORY_SEPARATOR . strtolower($package)));
-                @chmod($rdir . DIRECTORY_SEPARATOR . strtolower($package), 0777);
-            }
-
-            file_put_contents($rdir . DIRECTORY_SEPARATOR . strtolower($package) .
-                DIRECTORY_SEPARATOR . 'deps.' . $version . '.txt', serialize($deps));
-            @chmod($rdir . DIRECTORY_SEPARATOR . strtolower($package) .
-                DIRECTORY_SEPARATOR . 'deps.' . $version . '.txt', 0666);
-        }
-    }
-
-    public function saveAllPackagesREST()
-    {
-        $channel = DB_DataObject::factory('channels');
-        $channel->channel = $this->_channel;
-        $channel->find(true);
-        if ($channel->rest_support) {
-            $channelinfo = parse_url($this->_channel);
-            if (isset($channelinfo['host'])) {
-                $extra = $channelinfo['path'] . '/Chiara_PEAR_Server_REST/';
-            } else {
-                $extra = '/Chiara_PEAR_Server_REST/';
-            }
-            $pdir = $this->_restdir . DIRECTORY_SEPARATOR . 'p';
-
-            $info = '<?xml version="1.0" encoding="iso-8859-1" ?>
-<a xmlns="http://pear.php.net/dtd/rest.allpackages"
-    xsi:schemaLocation="http://pear.php.net/dtd/rest.allpackages
-    http://pear.php.net/dtd/rest.allpackages.xsd">
- <c>' . htmlspecialchars($this->_channel) . '</c>
-';
-            foreach ($this->listPackages(false, false, false) as $package)
-            {
-                $info .= ' <p>' . $package['package'] . '</p>
-';
-            }
-            $info .= '</a>';
-            file_put_contents($pdir . DIRECTORY_SEPARATOR . 'packages.xml', $info);
-            @chmod($pdir . DIRECTORY_SEPARATOR . 'packages.xml', 0666);
-        }
-    }
-
-    public function savePackageMaintainersREST($package)
-    {
-        $channel = DB_DataObject::factory('channels');
-        $channel->channel = $this->_channel;
-        $channel->find(true);
-        if ($channel->rest_support) {
-            $channelinfo = parse_url($this->_channel);
-            if (isset($channelinfo['host'])) {
-                $extra = $channelinfo['path'] . '/Chiara_PEAR_Server_REST/';
-            } else {
-                $extra = '/Chiara_PEAR_Server_REST/';
-            }
-            $maintainers = DB_DataObject::factory('maintainers');
-            $maintainers->package = $package;
-            $maintainers->channel = $this->_channel;
-            if ($maintainers->find(false)) {
-                $pdir = $this->_restdir . DIRECTORY_SEPARATOR . 'p';
-                if (!file_exists($pdir . DIRECTORY_SEPARATOR . strtolower($package))) {
-                    System::mkdir(array('-p', $pdir . DIRECTORY_SEPARATOR . strtolower($package)));
-                    @chmod($pdir . DIRECTORY_SEPARATOR . strtolower($package), 0777);
-                }
-                $info = '<?xml version="1.0" encoding="iso-8859-1" ?>
-<m xmlns="http://pear.php.net/dtd/rest.packagemaintainers"
-    xsi:schemaLocation="http://pear.php.net/dtd/rest.packagemaintainers
-    http://pear.php.net/dtd/rest.packagemaintainers.xsd">
- <p>' . $package . '</p>
- <c>' . htmlspecialchars($this->_channel) . '</c>
-';
-                while ($maintainers->fetch()) {
-                    $info .= ' <m><h>' . $maintainers->handle . '</h><a>' . $maintainers->active .
-                        '</a></m>';
-                }
-                $info .= '</m>';
-                file_put_contents($pdir . DIRECTORY_SEPARATOR . strtolower($package) .
-                    DIRECTORY_SEPARATOR . 'maintainers.xml', $info);
-                @chmod($pdir . DIRECTORY_SEPARATOR . strtolower($package) .
-                    DIRECTORY_SEPARATOR . 'maintainers.xml', 0666);
-            } else {
-                @unlink($pdir . DIRECTORY_SEPARATOR . strtolower($package) .
-                    DIRECTORY_SEPARATOR . 'maintainers.xml', $info);
-            }
-        }
-    }
-
-    public function saveAllReleasesREST($package)
-    {
-        $channel = DB_DataObject::factory('channels');
-        $channel->channel = $this->_channel;
-        $channel->find(true);
-        if ($channel->rest_support) {
-            $channelinfo = parse_url($this->_channel);
-            if (isset($channelinfo['host'])) {
-                $extra = $channelinfo['path'] . '/Chiara_PEAR_Server_REST/';
-            } else {
-                $extra = '/Chiara_PEAR_Server_REST/';
-            }
-            $releasedata = DB_DataObject::factory('releases');
-            $releasedata->channel = $this->_channel;
-            $releasedata->package = $package;
-            $releasedata->orderby('releasedate DESC');
-            $rdir = $this->_restdir . DIRECTORY_SEPARATOR . 'r';
-            // start from scratch to remove any errant files after a release is pulled
-            System::rm($rdir . DIRECTORY_SEPARATOR . strtolower($package));
-            if (!$releasedata->find(false)) {
-                return;
-            }
-            $info = '<?xml version="1.0" encoding="iso-8859-1" ?>
-<a xmlns="http://pear.php.net/dtd/rest.allreleases"
-    xsi:schemaLocation="http://pear.php.net/dtd/rest.allreleases
-    http://pear.php.net/dtd/rest.allreleases.xsd">
- <p>' . $package . '</p>
- <c>' . $this->_channel . '</c>
-';
-            while ($releasedata->fetch()) {
-                if (!class_exists('PEAR_PackageFile_Parser_v2')) {
-                    require_once 'PEAR/PackageFile/Parser/v2.php';
-                }
-                if (!class_exists('PEAR/Config.php')) {
-                    require_once 'PEAR/Config.php';
-                }
-                $pkg = new PEAR_PackageFile_Parser_v2;
-                $c = PEAR_Config::singleton();
-                $pkg->setConfig($c);
-                $pf = $pkg->parse($releasedata->packagexml, '');
-                if ($compat = $pf->getCompatible()) {
-                    if (!isset($compat[0])) {
-                        $compat = array($compat);
-                    }
-                    foreach ($compat as $entry) {
-                        $extra .= '<co><c>' . $entry['channel'] . '</c>' .
-                            '<p>' . $entry['name'] . '</p>' .
-                            '<min>' . $entry['min'] . '</min>' .
-                            '<max>' . $entry['max'] . '</max>';
-                        if (isset($entry['exclude'])) {
-                            if (!is_array($entry['exclude'])) {
-                                $entry['exclude'] = array($entry['exclude']);
-                            }
-                            foreach ($entry['exclude'] as $exclude) {
-                                $extra .= '<x>' . $exclude . '</x>';
-                            }
-                        }
-                        $extra .= '</co>
-';
-                    }
-                }
-                if (!isset($latest)) {
-                    $latest = $releasedata->version;
-                }
-                if ($releasedata->state == 'stable' && !isset($stable)) {
-                    $stable = $releasedata->version;
-                }
-                if ($releasedata->state == 'beta' && !isset($beta)) {
-                    $beta = $releasedata->version;
-                }
-                if ($releasedata->state == 'alpha' && !isset($alpha)) {
-                    $alpha = $releasedata->version;
-                }
-                $info .= ' <r><v>' . $releasedata->version . '</v><s>' . $releasedata->state . '</s></r>
-';
-            }
-            $info .= '</a>';
-            if (!file_exists($rdir . DIRECTORY_SEPARATOR . strtolower($package))) {
-                System::mkdir(array('-p', $rdir . DIRECTORY_SEPARATOR . strtolower($package)));
-                @chmod($rdir . DIRECTORY_SEPARATOR . strtolower($package), 0777);
-            }
-            file_put_contents($rdir . DIRECTORY_SEPARATOR . strtolower($package) .
-                DIRECTORY_SEPARATOR . 'allreleases.xml', $info);
-            @chmod($rdir . DIRECTORY_SEPARATOR . strtolower($package) .
-                DIRECTORY_SEPARATOR . 'allreleases.xml', 0666);
-
-            file_put_contents($rdir . DIRECTORY_SEPARATOR . strtolower($package) .
-                DIRECTORY_SEPARATOR . 'latest.txt', $latest);
-            @chmod($rdir . DIRECTORY_SEPARATOR . strtolower($package) .
-                DIRECTORY_SEPARATOR . 'latest.txt', 0666);
-            // remove .txt in case all releases of this stability were deleted
-            @unlink($rdir . DIRECTORY_SEPARATOR . strtolower($package) .
-                DIRECTORY_SEPARATOR . 'stable.txt');
-            @unlink($rdir . DIRECTORY_SEPARATOR . strtolower($package) .
-                DIRECTORY_SEPARATOR . 'beta.txt');
-            @unlink($rdir . DIRECTORY_SEPARATOR . strtolower($package) .
-                DIRECTORY_SEPARATOR . 'alpha.txt');
-            if (isset($stable)) {
-                file_put_contents($rdir . DIRECTORY_SEPARATOR . strtolower($package) .
-                    DIRECTORY_SEPARATOR . 'stable.txt', $stable);
-                @chmod($rdir . DIRECTORY_SEPARATOR . strtolower($package) .
-                    DIRECTORY_SEPARATOR . 'stable.txt', 0666);
-            }
-            if (isset($beta)) {
-                file_put_contents($rdir . DIRECTORY_SEPARATOR . strtolower($package) .
-                    DIRECTORY_SEPARATOR . 'beta.txt', $beta);
-                @chmod($rdir . DIRECTORY_SEPARATOR . strtolower($package) .
-                    DIRECTORY_SEPARATOR . 'beta.txt', 0666);
-            }
-            if (isset($alpha)) {
-                file_put_contents($rdir . DIRECTORY_SEPARATOR . strtolower($package) .
-                    DIRECTORY_SEPARATOR . 'alpha.txt', $alpha);
-                @chmod($rdir . DIRECTORY_SEPARATOR . strtolower($package) .
-                    DIRECTORY_SEPARATOR . 'alpha.txt', 0666);
-            }
-        }
-    }
-
-    public function deleteReleaseREST($package, $version)
-    {
-        $channel = DB_DataObject::factory('channels');
-        $channel->channel = $this->_channel;
-        $channel->find(true);
-        if ($channel->rest_support) {
-            $rdir = $this->_restdir . DIRECTORY_SEPARATOR . 'r';
-            if (!file_exists($rdir . DIRECTORY_SEPARATOR . strtolower($package))) {
-                return;
-            }
-            @unlink($rdir . DIRECTORY_SEPARATOR . strtolower($package) .
-                DIRECTORY_SEPARATOR . $version . '.xml');
-            @unlink($rdir . DIRECTORY_SEPARATOR . strtolower($package) .
-                DIRECTORY_SEPARATOR . 'deps.' . $version . '.txt');
-            @unlink($rdir . DIRECTORY_SEPARATOR . strtolower($package) .
-                DIRECTORY_SEPARATOR . 'package.' . $version . '.xml');
-            $this->saveAllReleasesREST($package);
-        }
-    }
-
-    public function saveReleaseREST($package, $version)
-    {
-        $channel = DB_DataObject::factory('channels');
-        $channel->channel = $this->_channel;
-        $channel->find(true);
-        if ($channel->rest_support) {
-            $channelinfo = parse_url($this->_channel);
-            if (isset($channelinfo['host'])) {
-                $extra = $channelinfo['path'] . '/Chiara_PEAR_Server_REST/';
-            } else {
-                $extra = '/Chiara_PEAR_Server_REST/';
-            }
-            $releasedata = DB_DataObject::factory('releases');
-            $releasedata->channel = $this->_channel;
-            $releasedata->package = $package;
-            $releasedata->version = $version;
-            if (!$releasedata->find(true)) {
-                throw new PEAR_Server_ExceptionReleaseNotFound($package, $version);
-            }
-            $release = $releasedata->toArray();
-            $rdir = $this->_restdir . DIRECTORY_SEPARATOR . 'r';
-
-            if (!file_exists($rdir . DIRECTORY_SEPARATOR . strtolower($package))) {
-                System::mkdir(array('-p', $rdir . DIRECTORY_SEPARATOR . strtolower($package)));
-                @chmod($rdir . DIRECTORY_SEPARATOR . strtolower($package), 0777);
-            }
-
-            $info = '<?xml version="1.0" encoding="iso-8859-1" ?>
-<r xmlns="http://pear.php.net/dtd/rest.release"
-    xsi:schemaLocation="http://pear.php.net/dtd/rest.release
-    http://pear.php.net/dtd/rest.release.xsd">
- <p xlink:href="' . $extra . 'p/' . strtolower($release['package']) . '">' . $release['package'] . '</p>
- <c>' . $release['channel'] . '</c>
- <v>' . $version . '</v>
- <st>' . $release['state'] . '</st>
- <l>' . $release['license'] . '</l>
- <m>' . $release['maintainer'] . '</m>
- <s>' . htmlspecialchars($release['summary']) . '</s>
- <d>' . htmlspecialchars($release['description']) . '</d>
- <da>' . $release['releasedate'] . '</da>
- <n>' . htmlspecialchars($release['releasenotes']) . '</n>
- <f>' . filesize($release['filepath']) . '</f>
- <g>http://' . $this->_channel . '/get/' . $release['package'] . '-' . $release['version'] . '</g>
- <x xlink:href="package.' . $version . '.xml"/>
-</r>';
-            file_put_contents($rdir . DIRECTORY_SEPARATOR . strtolower($release['package']) .
-                DIRECTORY_SEPARATOR . $version . '.xml', $info);
-            @chmod($rdir . DIRECTORY_SEPARATOR . strtolower($release['package']) .
-                DIRECTORY_SEPARATOR . $version . '.xml', 0666);
-            file_put_contents($rdir . DIRECTORY_SEPARATOR . strtolower($release['package']) .
-                DIRECTORY_SEPARATOR . 'package.' .
-                $version . '.xml', $this->getPackageXml($release['package'], $version));
-            @chmod($rdir . DIRECTORY_SEPARATOR . strtolower($release['package']) .
-                DIRECTORY_SEPARATOR . 'package.' . $version . '.xml', 0666);
-        }
-    }
-
     public function releaseExists(Chiara_PEAR_Server_Release $release)
     {
         if ($release->getChannel() != $this->_channel) {
@@ -678,162 +383,6 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
         return $ret;
     }
 
-    public function deleteCategoryREST($category)
-    {
-        $channel = DB_DataObject::factory('channels');
-        $channel->channel = $this->_channel;
-        $channel->find(true);
-        if ($channel->rest_support) {
-            $cdir = $this->_restdir . DIRECTORY_SEPARATOR . 'c';
-            if (!file_exists($cdir . DIRECTORY_SEPARATOR . urlencode($category))) {
-                return;
-            }
-            // remove all category info
-            System::rm(array('-r', $this->_restdir . DIRECTORY_SEPARATOR . 'c'
-                . DIRECTORY_SEPARATOR . urlencode($category)));
-        }
-    }
-
-    public function saveCategoryREST($category)
-    {
-        $channel = DB_DataObject::factory('channels');
-        $channel->channel = $this->_channel;
-        $channel->find(true);
-        if ($channel->rest_support) {
-            $channelinfo = parse_url($this->_channel);
-            if (isset($channelinfo['host'])) {
-                $extra = $channelinfo['path'] . '/Chiara_PEAR_Server_REST/';
-            } else {
-                $extra = '/Chiara_PEAR_Server_REST/';
-            }
-            $cdir = $this->_restdir . DIRECTORY_SEPARATOR . 'c';
-            $category = $this->categoryInfo($category);
-            if (!file_exists($cdir . DIRECTORY_SEPARATOR . urlencode($category['name']))) {
-                System::mkdir(array('-p', $cdir . DIRECTORY_SEPARATOR . urlencode($category['name'])));
-                @chmod($cdir . DIRECTORY_SEPARATOR . urlencode($category['name']), 0777);
-            }
-            $info = '<?xml version="1.0" encoding="iso-8859-1" ?>
-<c xmlns="http://pear.php.net/dtd/rest.category"
-    xsi:schemaLocation="http://pear.php.net/dtd/rest.category
-    http://pear.php.net/dtd/rest.category.xsd">
- <n>' . htmlspecialchars($category['name']) . '</n>
- <c>' . $category['channel'] . '</c>
- <a>' . $category['alias'] . '</a>
- <d>' . htmlspecialchars($category['description']) . '</d>
-</c>';
-            // category info
-            file_put_contents($cdir . DIRECTORY_SEPARATOR . urlencode($category['name']) .
-                DIRECTORY_SEPARATOR . 'info.xml', $info);
-            @chmod($cdir . DIRECTORY_SEPARATOR . urlencode($category['name']) .
-                DIRECTORY_SEPARATOR . 'info.xml', 0666);
-            $list = '<?xml version="1.0" encoding="iso-8859-1" ?>
-<l xmlns="http://pear.php.net/dtd/rest.categorypackages"
-    xsi:schemaLocation="http://pear.php.net/dtd/rest.categorypackages
-    http://pear.php.net/dtd/rest.categorypackages.xsd">
-';
-            foreach ($this->listPackagesInCategory($category['name']) as $package) {
-                $list .= ' <p xlink:href="' . $extra . 'p/' . strtolower($package['package']) . '">' .
-                    $package['package'] . '</p>
-';
-            }
-            $list .= '</l>';
-            // list packages in a category
-            file_put_contents($cdir . DIRECTORY_SEPARATOR . urlencode($category['name']) .
-                DIRECTORY_SEPARATOR . 'packages.xml', $list);
-            @chmod($cdir . DIRECTORY_SEPARATOR . urlencode($category['name']) .
-                DIRECTORY_SEPARATOR . 'packages.xml', 0666);
-        }
-    }
-
-    public function deletePackageREST($package, $category)
-    {
-        $channel = DB_DataObject::factory('channels');
-        $channel->channel = $this->_channel;
-        $channel->find(true);
-        if ($channel->rest_support) {
-            // remove all package and release info for the package
-            System::rm(array('-r', $this->_restdir . DIRECTORY_SEPARATOR . 'p'
-                . DIRECTORY_SEPARATOR . strtolower($package)));
-            System::rm(array('-r', $this->_restdir . DIRECTORY_SEPARATOR . 'r'
-                . DIRECTORY_SEPARATOR . strtolower($package)));
-            // reset categories info
-            $this->saveCategoryREST($category);
-        }
-    }
-
-    public function savePackageREST($package)
-    {
-        $channel = DB_DataObject::factory('channels');
-        $channel->channel = $this->_channel;
-        $channel->find(true);
-        if ($channel->rest_support) {
-            $channelinfo = parse_url($this->_channel);
-            if (isset($channelinfo['host'])) {
-                $extra = $channelinfo['path'] . '/Chiara_PEAR_Server_REST/';
-            } else {
-                $extra = '/Chiara_PEAR_Server_REST/';
-            }
-            $packages = DB_DataObject::factory('packages');
-            $packages->channel = $this->_channel;
-            $packages->package = $package;
-            if (!$packages->find(true)) {
-                throw new Chiara_PEAR_Server_ExceptionPackageDoesntExist($package, $this->_channel);
-            }
-            $package = $packages->toArray();
-
-            $pdir = $this->_restdir . DIRECTORY_SEPARATOR . 'p';
-            if (!file_exists($pdir . DIRECTORY_SEPARATOR . strtolower($package['package']))) {
-                System::mkdir(array('-p', $pdir . DIRECTORY_SEPARATOR .
-                    strtolower($package['package'])));
-                @chmod($pdir . DIRECTORY_SEPARATOR . strtolower($package['package']), 0777);
-            }
-            $catinfo = $this->categoryInfo($this->categoryFromId($package['category_id']));
-            if ($package['parent']) {
-                $parent = '<pa xlink:href="' . $extra . 'p/' . $package['parent'] . '">' . 
-                    $package['parent'] . '</pa>
-';
-            } else {
-                $parent = '';
-            }
-            if ($package['deprecated_package']) {
-                if ($package['deprecated_channel'] == $this->_channel) {
-                    $deprecated = '<dc>' . $package['deprecated_channel'] . '</dc>
- <dp href="' . $extra . 'p/' . $package['deprecated_package'] . '"> ' .
-                    $package['deprecated_package'] . '</dp>
-';
-                } else {
-                    $deprecated = '<dc>' . $package['deprecated_channel'] . '</dc>
- <dp> ' . $package['deprecated_package'] . '</dp>
-';
-                }
-            } else {
-                $deprecated = '';
-            }
-            $info = '<?xml version="1.0" encoding="iso-8859-1" ?>
-<p xmlns="http://pear.php.net/dtd/rest.package"
-    xsi:schemaLocation="http://pear.php.net/dtd/rest.package
-    http://pear.php.net/dtd/rest.package.xsd">
- <n>' . $package['package'] . '</n>
- <c>' . $package['channel'] . '</c>
- <ca xlink:href="' . $extra . 'c/' . urlencode($catinfo['name']) . '">' .
-            htmlspecialchars($catinfo['name']) . '</ca>
- <l>' . $package['license'] . '</l>' . ($package['licenseuri'] ? '
- <lu>' . $package['licenseuri'] . '</lu>
-' : '
-') . '
- <s>' . htmlspecialchars($package['summary']) . '</s>
- <d>' . htmlspecialchars($package['description']) . '</d>
- <r xlink:href="' . $extra . 'r/' . $package['package'] . '"/>
- ' . $parent . $deprecated . '
-</p>';
-            // package information
-            file_put_contents($pdir . DIRECTORY_SEPARATOR . strtolower($package['package']) .
-                DIRECTORY_SEPARATOR . 'info.xml', $info);
-            @chmod($pdir . DIRECTORY_SEPARATOR . strtolower($package['package']) .
-                DIRECTORY_SEPARATOR . 'info.xml', 0666);
-        }
-    }
-
     public function updateCategory($cat)
     {
         if ($cat->name == 'Default') {
@@ -862,7 +411,6 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
 
     public function getCategory($cat)
     {
-        
         $p = DB_DataObject::factory('categories');
         $p->channel = $this->_channel;
         $p->name = $cat;
@@ -870,7 +418,6 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
         if (!$row) {
             throw new Chiara_PEAR_Server_ExceptionCategoryDoesntExist($cat, $this->_channel);
         }
-        
         return $p;
     }
 
@@ -956,7 +503,7 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
         $package->license = $pkg->license;
         $package->description = $pkg->description;
         $package->summary = $pkg->summary;
-        
+
         $packages_extras->channel = $this->_channel;
         $packages_extras->package = $pkg->name;
         $packages_extras->cvs_uri = $pkg->cvs_uri;
@@ -990,17 +537,17 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
         }
         $package_extras->channel = $this->_channel;
         $package_extras->package = $pkg->name;
-        
+
         $package_extras_exists = false;
-        
+
         if ($package_extras->find(true)) {
             $package_extras_exists = true;
         }
-        
+
         $package_extras->cvs_uri = $pkg->cvs_uri;
         $package_extras->bugs_uri = $pkg->bugs_uri;
         $package_extras->docs_uri = $pkg->docs_uri;
-        
+
         $package->category_id = $pkg->category_id;
         $package->license = $pkg->license;
         $package->licenseuri = $pkg->license_uri;
@@ -1009,13 +556,13 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
         $package->deprecated_channel = $pkg->deprecated_channel;
         $package->deprecated_package = $pkg->deprecated_package;
         $pkg->parent ? ($package->parent = $pkg->parent) : null;
-        
+
         if ($package_extras_exists) {
             $package_extras->update();
         } else {
             $package_extras->insert();
         }
-        
+
         $ret = $package->update();
         if ($ret) {
             $this->savePackageREST($pkg->name);
@@ -1048,10 +595,10 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
         $package->deprecated_package = $p->deprecated_package;
         return $package;
     }
-    
+
     public function getPackageExtras($pkg)
     {
-        
+
         $extras = DB_DataObject::factory('package_extras');
         $extras->channel = $this->_channel;
         $extras->package = $pkg;
@@ -1083,16 +630,16 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
         if (!$package->find(true)) {
             return false;
         }
-        if (isset($package->$key)) {
+        if ($key && isset($package->$key)) {
             return $package->$key;
         }
         if ($key === null) {
             $ret = $package->toArray();
             $ret['name'] = $ret['package'];
-            $ret['category'] = 'Packages';
+            $ret['category'] = $this->categoryFromId($ret['category_id']);
             $ret['releases'] = $this->listReleases($pkg);
             if (count($ret['releases'])) {
-                $temp = array_shift(array_values($ret['releases']));
+                $temp = array_shift($a = array_values($ret['releases']));
                 // it's not really necessarily stable - this is crap legacy from pearweb
                 $ret['stable'] = $temp['version'];
             } else {
@@ -1109,6 +656,14 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
         if ($key == 'deps') {
             return $this->listDeps($pkg, $rel['version']);
         }
+    }
+
+    public function packageExists($package)
+    {
+        $packages = DB_DataObject::factory('packages');
+        $packages->channel = $this->_channel;
+        $packages->package = $package;
+        return $packages->find(true);
     }
 
     public function deleteMaintainer($maintainer)
@@ -1132,25 +687,6 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
         return $ret;
     }
 
-    public function deleteMaintainerREST(Chiara_PEAR_Server_Maintainer $maintainer)
-    {
-        $channel = DB_DataObject::factory('channels');
-        $channel->channel = $this->_channel;
-        $channel->find(true);
-        if ($channel->rest_support) {
-            $channelinfo = parse_url($this->_channel);
-            if (isset($channelinfo['host'])) {
-                $extra = $channelinfo['path'] . '/Chiara_PEAR_Server_REST/';
-            } else {
-                $extra = '/Chiara_PEAR_Server_REST/';
-            }
-            $mdir = $this->_restdir . DIRECTORY_SEPARATOR . 'm';
-            if (file_exists($mdir . DIRECTORY_SEPARATOR . $maintainer->handle)) {
-                System::rm(array('-r', $mdir . DIRECTORY_SEPARATOR . $maintainer->handle));
-            }
-        }        
-    }
-
     /**
      * @param Chiara_PEAR_Server_Maintainer
      */
@@ -1172,44 +708,6 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
         return $ret;
     }
 
-    public function saveMaintainerREST(Chiara_PEAR_Server_Maintainer $maintainer)
-    {
-        $channel = DB_DataObject::factory('channels');
-        $channel->channel = $this->_channel;
-        $channel->find(true);
-        if ($channel->rest_support) {
-            $channelinfo = parse_url($this->_channel);
-            if (isset($channelinfo['host'])) {
-                $extra = $channelinfo['path'] . '/Chiara_PEAR_Server_REST/';
-            } else {
-                $extra = '/Chiara_PEAR_Server_REST/';
-            }
-            $mdir = $this->_restdir . DIRECTORY_SEPARATOR . 'm';
-            if (!file_exists($mdir . DIRECTORY_SEPARATOR . $maintainer->handle)) {
-                System::mkdir(array('-p', $mdir . DIRECTORY_SEPARATOR . $maintainer->handle));
-                @chmod($mdir . DIRECTORY_SEPARATOR . $maintainer->handle, 0777);
-            }
-            if ($maintainer->uri) {
-                $uri = ' <u>' . htmlspecialchars($maintainer->uri) . '</u>
-';
-            } else {
-                $uri = '';
-            }
-            $info = '<?xml version="1.0" encoding="iso-8859-1" ?>
-<m xmlns="http://pear.php.net/dtd/rest.maintainer"
-    xsi:schemaLocation="http://pear.php.net/dtd/rest.maintainer
-    http://pear.php.net/dtd/rest.maintainer.xsd">
- <h>' . $maintainer->handle . '</h>
- <n>' . htmlentities($maintainer->name) . '</n>
-' . $uri . '</m>';
-            // package information
-            file_put_contents($mdir . DIRECTORY_SEPARATOR . $maintainer->handle .
-                DIRECTORY_SEPARATOR . 'info.xml', $info);
-            @chmod($mdir . DIRECTORY_SEPARATOR . $maintainer->handle .
-                DIRECTORY_SEPARATOR . 'info.xml', 0666);
-        }
-    }
-
     /**
      * @param Chiara_PEAR_Server_Maintainer
      */
@@ -1223,9 +721,15 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
         }
         $handle->email = $maintainer->email;
         $handle->name = $maintainer->name;
+        $handle->uri = $maintainer->uri;
+        $handle->description = $maintainer->description;
+        $handle->wishlist = $maintainer->wishlist;
+        if (strlen($maintainer->password) >= 6) {
+            $handle->password = md5($maintainer->password);
+        }
         $ret = $handle->update() !== false;
         if ($ret) {
-            $this->saveMaintainerREST();
+            $this->saveMaintainerREST($maintainer);
         }
         return $ret;
     }
