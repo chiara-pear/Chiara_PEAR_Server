@@ -230,7 +230,18 @@ class Chiara_PEAR_Server_ExceptionInvalidRelease extends Chiara_PEAR_Server_Exce
 
     public function __construct($packagefile, $msg = false)
     {
-        $this->_data = array('info' => $packagefile->getUserInfo());
+        $info = '';
+        if (is_array($packagefile->getUserInfo())) {
+            foreach ($packagefile->getUserInfo() as $err) {
+                if ($info) {
+                    $info .= ', ';
+                }
+                $info .= $err['message'];
+            }
+        } else {
+            $info = $packagefile->getMessage();
+        }
+        $this->_data = array('info' => $info);
         parent::__construct($msg ? $msg : $this->_message);
     }
 }

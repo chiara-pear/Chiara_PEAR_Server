@@ -1,16 +1,27 @@
 <?php
 require_once 'Chiara/PEAR/Server/Maintainer.php';
+/**
+ * Base class for all backends.
+ * @author Gregory Beaver <cellog@php.net>
+ */
 abstract class Chiara_PEAR_Server_Backend
 {
     protected $_channel;
     protected $_restdir;
 
-    public function __construct($channel, $restdir = false)
+    /**
+     * @param string channel server
+     * @param string path to REST files
+     */
+    public function __construct($channel, $restdir)
     {
         $this->_channel = $channel;
         $this->_restdir = $restdir;
     }
 
+    /**
+     * @return string
+     */
     public function getChannel()
     {
         return $this->_channel;
@@ -24,22 +35,55 @@ abstract class Chiara_PEAR_Server_Backend
         return false;
     }
 
+    /**
+     * @param string
+     * @param string
+     */
     abstract public function saveReleaseREST($package, $version);
 
+    /**
+     * @param string
+     */
     abstract public function saveAllReleasesREST($package);
 
+    /**
+     * @param string
+     */
     abstract public function savePackageREST($package);
 
+    /**
+     * @param string
+     * @param string
+     */
     abstract public function deletePackageREST($package, $category);
 
+    /**
+     * @param string
+     */
     abstract public function saveCategoryREST($category);
 
+    /**
+     * @param string
+     */
     abstract public function deleteCategoryREST($category);
 
+    /**
+     * @param string
+     * @param string
+     */
     abstract public function deleteRelease($packagename, $version);
 
+    /**
+     * @param string
+     * @param string
+     */
     abstract public function deleteReleaseREST($packagename, $version);
 
+    /**
+     * @param string
+     * @param string
+     * @return string
+     */
     abstract public function getReleasePath($packagename, $version);
 
     /**
@@ -47,10 +91,24 @@ abstract class Chiara_PEAR_Server_Backend
      */
     abstract public function saveRelease(Chiara_PEAR_Server_Release $release);
 
+    /**
+     * @param string
+     * @param string
+     * @return boolean
+     */
     abstract public function validLogin($user, $password);
 
+    /**
+     * @param string
+     * @return boolean
+     */
     abstract public function isAdmin($user);
 
+    /**
+     * @param string
+     * @param string
+     * @return boolean
+     */
     abstract public function isDeprecatedPackage($channel, $package);
 
     abstract public function releaseExists(Chiara_PEAR_Server_Release $release);
@@ -65,24 +123,61 @@ abstract class Chiara_PEAR_Server_Backend
      */
     abstract public function getFilesize($fullpath);
 
+    /**
+     * @param boolean
+     * @param boolean
+     * @param boolean
+     * @return array
+     */
     abstract public function listPackages($releasedOnly = true, $onlyStable = true, $nosubpackages = true);
 
+    /**
+     * @param string
+     * @return array
+     */
     abstract public function listPackagesInCategory($category);
 
+    /**
+     * @return array
+     */
     abstract public function listCategories();
 
+    /**
+     * @param string
+     */
     abstract public function addCategory($cat);
 
+    /**
+     * @param string
+     */
     abstract public function updateCategory($cat);
 
+    /**
+     * @param string
+     */
     abstract public function getCategory($cat);
 
+    /**
+     * @param string
+     */
     abstract public function deleteCategory($cat);
 
+    /**
+     * @param int
+     */
     abstract public function categoryFromId($cat);
 
+    /**
+     * @param string
+     * @return array
+     */
     abstract public function categoryInfo($cat);
 
+    /**
+     * @param string
+     * @param string
+     * @return array
+     */
     abstract public function listDeps($package, $version);
 
     /**
@@ -95,6 +190,9 @@ abstract class Chiara_PEAR_Server_Backend
      */
     abstract public function addPackage($package);
 
+    /**
+     * @param string
+     */
     abstract public function deletePackage($packagename);
 
     /**
@@ -108,6 +206,11 @@ abstract class Chiara_PEAR_Server_Backend
      */
     abstract public function getPackage($package);
 
+    /**
+     * @param string
+     * @param string package info key
+     * @return mixed
+     */
     abstract public function packageInfo($package, $key = null);
 
     abstract public function addMaintainer(Chiara_PEAR_Server_Maintainer $maintainer);

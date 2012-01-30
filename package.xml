@@ -8,7 +8,7 @@ approach to implementing the channel protocol.
 By default, a lightweight database is used,
 accessed by a DB_DataObject backend,
 with an administrative frontend using HTML_QuickForm and
-xml-rpc frontend using Chiara_XML_RPC5
+REST-based static frontend
 Chiara_PEAR_Server replaces PEAR_Server</description>
  <lead>
   <name>Greg Beaver</name>
@@ -22,10 +22,10 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
   <email>davey@php.net</email>
   <active>yes</active>
  </lead>
- <date>2005-05-28</date>
- <time>20:04:07</time>
+ <date>2005-05-31</date>
+ <time>23:33:33</time>
  <version>
-  <release>0.18.0</release>
+  <release>0.18.1</release>
   <api>0.18.0</api>
  </version>
  <stability>
@@ -33,12 +33,8 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
   <api>alpha</api>
  </stability>
  <license uri="http://www.php.net/license">PHP License</license>
- <notes>Implement REST support
-    Remove XML-RPC support entirely
-    fix subpackage support
-    fix package.info
-    fix PHP5 issue with visibility of Xmlrpc5 server contructor
-    add the ability to delete a package</notes>
+ <notes>Consolidate post-install scripts
+    fix invalid release exception error message</notes>
  <contents>
   <dir baseinstalldir="Chiara/PEAR" name="/">
    <file baseinstalldir="Chiara/PEAR" md5sum="351a9e38af3b04e3b84ba701e43353a2" name="data/DBDataObject/pearserver.ini" role="data"/>
@@ -60,12 +56,12 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
     <tasks:replace from="@php-dir@" to="php_dir" type="pear-config"/>
    </file>
    <file baseinstalldir="Chiara/PEAR" md5sum="7be3af5b00b33f009009a46b8c914273" name="Server/Frontend/HTMLQuickForm.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="4eaebb18e250596ebd3931348403f160" name="Server/Backend.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="314aefbeefc364b0969235ac4566cb49" name="Server/Exception.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="7d624a4764f11d42b908d1a689213b55" name="Server/Backend.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="c5409863a5409f9a347a5be74102dcb8" name="Server/Exception.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="e7c92c79ed7d708a2e67b66dbdb62daf" name="Server/Frontend.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="b45466760ee1535b6fde965bd4ca3c84" name="Server/Maintainer.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="d2f5bf50575065424870baaee1bdd196" name="Server/Package.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="0d9490718cfbd43cc8762eb29076150d" name="Server/mysqlinstall.php" role="php">
+   <file baseinstalldir="Chiara/PEAR" md5sum="1d6d4efd6630cf1faa4e27cb261be953" name="Server/mysqlinstall.php" role="php">
     <tasks:postinstallscript>
      <paramgroup>
       <id>questionCreate</id>
@@ -178,49 +174,6 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
        <prompt>protocol clients should use to connect (http or https)</prompt>
        <type>string</type>
        <default>http</default>
-      </param>
-     </paramgroup>
-    </tasks:postinstallscript>
-    <tasks:replace from="@data-dir@" to="data_dir" type="pear-config"/>
-    <tasks:replace from="@php-dir@" to="php_dir" type="pear-config"/>
-   </file>
-   <file baseinstalldir="Chiara/PEAR" md5sum="50e34c84008188bc26918541e5a69b20" name="Server/restsetup.php" role="php">
-    <tasks:postinstallscript>
-     <paramgroup>
-      <id>processExistingReleases</id>
-      <param>
-       <name>database</name>
-       <prompt>Mysql database</prompt>
-       <type>string</type>
-       <default>pear</default>
-      </param>
-      <param>
-       <name>user</name>
-       <prompt>Mysql Username (must have create permision)</prompt>
-       <type>string</type>
-       <default>pear</default>
-      </param>
-      <param>
-       <name>password</name>
-       <prompt>Mysql password</prompt>
-       <type>string</type>
-       <default>pear</default>
-      </param>
-      <param>
-       <name>dbhost</name>
-       <prompt>Database Host</prompt>
-       <type>string</type>
-       <default>localhost</default>
-      </param>
-      <param>
-       <name>name</name>
-       <prompt>Channel Name (server uri like pear.php.net)</prompt>
-       <type>string</type>
-      </param>
-      <param>
-       <name>webroot</name>
-       <prompt>Path to document root (htdocs or public_html)</prompt>
-       <type>string</type>
       </param>
      </paramgroup>
     </tasks:postinstallscript>
@@ -526,6 +479,20 @@ fix package.info</notes>
     fix package.info
     fix PHP5 issue with visibility of Xmlrpc5 server contructor
     add the ability to delete a package</notes>
+  </release>
+  <release>
+   <version>
+    <release>0.18.1</release>
+    <api>0.18.0</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2005-05-31</date>
+   <license uri="http://www.php.net/license">PHP License</license>
+   <notes>Consolidate post-install scripts
+    fix invalid release exception error message</notes>
   </release>
  </changelog>
 </package>
