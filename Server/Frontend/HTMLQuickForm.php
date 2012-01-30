@@ -34,7 +34,7 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
             @session_register('_currentUser');
             @session_register('_currentUserAdmin');
             if (!is_array($_SESSION['_currentUser'])) {
-                $_SESSION['currentUser'] = array();
+                $_SESSION['_currentUser'] = array();
             }
             $_SESSION['_currentUser'][$this->_channel] = false;
             if (!is_array($_SESSION['_currentUserAdmin'])) {
@@ -116,10 +116,12 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
             case 'addPackage' :
                 $this->doMainMenu('doAddPackage', $func);
             break;
-            case "myAccount" :
+            case 'myAccount' :
                 $this->doMainMenu('doMyAccount', $func);
                 break;
             case 'listPackages' :
+            	$this->doMainMenu('doListPackages', $func);
+            	break;
             case 'listReleases' :
             case 'listLatestReleases' :
             case 'packageInfo' :
@@ -159,6 +161,7 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
             }
         }
         echo $this->_quickForm->toHtml();
+        echo '<p>You will need cookies</p>';
         echo '<a onclick="history.go(-1);">Go Back</a>';
     }
 
@@ -235,20 +238,9 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
         <ul id="nav">
             <li><a href="<?php echo $this->_index; ?>?f=<?php echo $this->_server->getMethodIndex('addRelease'); ?>">Upload a Release</a></li>
         </ul>
-        <h2>Manage Packages</h2>
-        <ul>
         <?php
-        foreach ($this->_backend->listPackages(false, false, false) as $package) {
-            if (!$this->_backend->packageLead($package['package'], $this->_user)) {
-                continue;
-            }
-            echo '<li><a href="' . $this->_index . '?f=' . $this->_server->getMethodIndex('managePackage') . '&managepackage=' . $package['package'] . '">' . $package['package'] . "</a>".' <a href="' . $this->_index . '?f=' .
-            $this->_server->getMethodIndex('managePackageMaintainers') . '&managepackage=' . $package['package'] .
-            '">(Maintainers)</a>' ."</li>";
-        }
-        ?>
-        </ul>
-        <?php
+        echo '<h2><a href="'.$this->_index. '?f=' .$this->_server->getMethodIndex('listPackages').'">Manage Packages</a></h2>';
+        
     }
 
     public function adminMenu()
@@ -272,18 +264,10 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
         foreach ($this->_backend->listCategories() as $category) {
             echo '<li><a href="' .$this->_index. '?f=' .$this->_server->getMethodIndex('manageCategory') .'&amp;managecategory=' .$category['name']. '">'. $category['name'] . "</a></li>";
         }
+        $url = $this->_index. '?f=' .$this->_server->getMethodIndex('listPackages');
         ?>
         </ul>
-        <h2>Manage Packages</h2>
-        <ul>
-        <?php
-        foreach ($this->_backend->listPackages(false, false, false) as $package) {
-            echo '<li><a href="' . $this->_index . '?f=' . $this->_server->getMethodIndex('managePackage') . '&managepackage=' . $package['package'] . '">' . $package['package'] . "</a>".' <a href="' . $this->_index . '?f=' .
-            $this->_server->getMethodIndex('managePackageMaintainers') . '&managepackage=' . $package['package'] .
-            '">(Maintainers)</a>' ."</li>";
-        }
-        ?>
-        </ul>
+        <h2><a href="<?php echo $url; ?>">Manage Packages</a></h2>
         <h2>Manage Maintainers</h2>
         <ul>
         <?php
@@ -304,6 +288,11 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
         $this->_quickForm->setConstants(array('f' => $this->_server->getMethodIndex($func)));
         $this->_quickForm->addElement('header', '', 'Upload a Package Release');
         $this->_quickForm->addElement('file', 'release', '.tgz release');
+        if ($this->_backend->isAdmin($this->_user)) {
+            //only channel admins may automatically add packages and users
+            $this->_quickForm->addElement('checkbox', 'createpackage', 'Create package in database if missing');
+            $this->_quickForm->addElement('checkbox', 'createuser', 'Create users in database if missing');
+        }
         $this->_quickForm->addElement('hidden', 'submitted', '1');
         $this->_quickForm->addElement('hidden', 'f', 'f');
         $this->_quickForm->addElement('submit', 'Submit', 'Submit');
@@ -311,14 +300,22 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
         $this->_quickForm->addRule('release', 'Must be a valid file on your computer', 'uploadedfile');
         if (isset($_REQUEST['submitted']) && $this->_quickForm->validate()) {
             $file = $this->_quickForm->getElement('release');
+            if ($this->_backend->isAdmin($this->_user)) {
+                $createpackage = $this->_quickForm->getElementValue('createpackage');
+                $createuser    = $this->_quickForm->getElementValue('createuser');
+            } else {
+                $createpackage = false;
+                $createuser    = false;
+            }
             if ($file->isUploadedFile()) {
                 $fullpath = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR),
                 tempnam($this->_tmpdir, 'upl'));
                 $file->moveUploadedFile($this->_tmpdir, basename($fullpath));
-                $release = new Chiara_PEAR_Server_Release($fullpath, $this->_user, PEAR_Config::singleton(),
-                $this->_tmpdir);
+                $release = new Chiara_PEAR_Server_Release(
+                    $fullpath, $this->_user, PEAR_Config::singleton(), $this->_tmpdir
+                );
                 try {
-                    if ($this->_server->addRelease($release)) {
+                    if ($this->_server->addRelease($release, true, $createpackage, $createuser)) {
                         echo 'Release successfully saved<br />';
                     } else {
                         echo '<strong>Error:</strong> Saving release failed<br />';
@@ -334,6 +331,38 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
             }
             return;
         } else {
+            if (isset($_FILES['release']['error'])) {
+                switch ($_FILES['release']['error']) {
+                    case UPLOAD_ERR_OK:
+                        $error = 'No upload error';
+                        break;
+                    case UPLOAD_ERR_INI_SIZE:
+                        $error = 'File size exceeds the upload_max_filesize directive in php.ini';
+                        break;
+                    case UPLOAD_ERR_FORM_SIZE:
+                        $error = 'File size exceeds the MAX_FILE_SIZE directive in the form';
+                        break;
+                    case UPLOAD_ERR_PARTIAL:
+                        $error = 'File has been uploaded partially only';
+                        break;
+                    case UPLOAD_ERR_NO_FILE:
+                        $error = 'No file has been uploaded';
+                        break;
+                    case UPLOAD_ERR_NO_TMP_DIR:
+                        $error = 'No temporary directory';
+                        break;
+                    case 7://UPLOAD_ERR_CANT_WRITE: (since 5.1.0 only)
+                        $error = 'Failed to write file to disk';
+                        break;
+                    case 8://UPLOAD_ERR_EXTENSION: (since 5.2.0 only)
+                        $error = 'File upload stopped by extension';
+                        break;
+                    default:
+                        $error = 'Unknown upload error';
+                        break;
+                }
+                echo '<strong>Error:</strong> ' . $error . '<br />';
+            }
             echo $this->_quickForm->toHtml();
         }
     }
@@ -467,6 +496,26 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
         }
     }
 
+    public function doListPackages()
+    {
+        require_once 'HTML/Table.php';
+        echo '<p>Choose a package to manage</p>';
+    	$table = new HTML_Table();
+        $table->addRow(array('Package Name','Maintainers'),array(),'TH');
+        foreach ($this->_backend->listPackages(false, false, false) as $package) {
+            if (!$this->_backend->packageLead($package['package'], $this->_user)) {
+                continue;
+            }
+            $table->addRow(array('<a href="' . $this->_index . '?f=' . $this->_server->getMethodIndex('managePackage') . '&amp;managepackage=' . $package['package'] . '">' . $package['package'] . '</a>',
+            	' <a href="' . $this->_index . '?f=' . $this->_server->getMethodIndex('managePackageMaintainers') . '&amp;managepackage=' . $package['package'] .
+            '">(Maintainers)</a>'));
+        }
+        echo $table->toHtml();
+        if ($this->_backend->isAdmin($this->_user)) {
+            echo '<p><a href="' . $this->_index . '?f=' . $this->_server->getMethodIndex('addPackage') .'">Create a Package</a></p>';
+        }
+    }
+    
     public function doManageCategory($fn, $category)
     {
         if ($category == "Default") {
@@ -664,6 +713,7 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
             $defaults = $info->toArray();
             $defaults['managemaintainer'] = $info->handle;
             $defaults['f'] = $_REQUEST['f'];
+            $defaults['password'] = '';
             $this->_quickForm->setDefaults($defaults);
             $this->_quickForm->addElement('header', '', 'Edit Maintainer Information');
             $this->_quickForm->addElement('static', 'handle', 'Handle');
@@ -672,6 +722,13 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
             $this->_quickForm->addElement('hidden', 'managemaintainer', 'License');
             $this->_quickForm->addElement('text', 'email', 'Email', array('size' => 40));
             $this->_quickForm->addElement('checkbox', 'admin', 'Channel Administrator');
+            if ($this->_backend->isAdmin($this->_user)) {
+                //admins may change the dev's password
+                $this->_quickForm->addElement('password', 'password', 'Password');
+                $this->_quickForm->addElement('password', 'confirm_password', 'Confirm Password');
+                $this->_quickForm->addRule('password', 'Password must be at least 6 characters long', 'minlength', 6, 'client');
+                $this->_quickForm->addRule(array('password', 'confirm_password'), "The passwords do not match", 'compare', null, 'client');
+            }
             $this->_quickForm->addElement('submit', 'submitted', 'Save Changes');
             $this->_quickForm->addRule('name', 'Required', 'required');
             $this->_quickForm->addRule('email', 'Required', 'required');

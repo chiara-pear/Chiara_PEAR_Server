@@ -46,7 +46,7 @@ class Chiara_PEAR_Server_REST
             unset ($release);
         }
         if (!isset($release)) {
-            throw new PEAR_Server_ExceptionReleaseNotFound($package, $version);
+            throw new Chiara_PEAR_Server_ExceptionReleaseNotFound($package, $version);
         }
         $rdir = $this->_restdir . DIRECTORY_SEPARATOR . 'r';
 

@@ -246,7 +246,7 @@ class Chiara_PEAR_Server_ExceptionInvalidRelease extends Chiara_PEAR_Server_Exce
     }
 }
 
-class PEAR_Server_ExceptionReleaseNotFound extends Chiara_PEAR_Server_Exception
+class Chiara_PEAR_Server_ExceptionReleaseNotFound extends Chiara_PEAR_Server_Exception
 {
     protected $_message = 'Package %p% release %v% does not exist';
 
@@ -299,5 +299,10 @@ class Chiara_PEAR_Server_CannotSaveRelease extends Chiara_PEAR_Server_Exception
         $this->_data = array('r' => $release);
         parent::__construct($msg ? $msg : $this->_message);
     }
+}
+
+class Chiara_PEAR_Server_ExceptionCannotAddPackage extends Chiara_PEAR_Server_Exception
+{
+    protected $_message = 'Cannot add package.';
 }
 ?>

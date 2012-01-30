@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" packagerversion="1.4.11" version="2.0" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
+<package xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" packagerversion="1.7.3" version="2.0" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
  <name>Chiara_PEAR_Server</name>
  <channel>chiara-local</channel>
  <summary>A lightweight pearweb-compatible channel server for hosting a PEAR channel</summary>
@@ -17,77 +17,83 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
   <active>yes</active>
  </lead>
  <lead>
+  <name>Brett Bieber</name>
+  <user>bbieber</user>
+  <email>brett.bieber@gmail.com</email>
+  <active>yes</active>
+ </lead>
+ <lead>
   <name>Davey Shafik</name>
   <user>davey</user>
   <email>davey@php.net</email>
-  <active>yes</active>
+  <active>no</active>
  </lead>
  <lead>
   <name>Clay Loveless</name>
   <user>clay</user>
   <email>clay@killersoft.com</email>
-  <active>yes</active>
+  <active>no</active>
  </lead>
- <date>2006-08-19</date>
- <time>22:19:10</time>
+ <date>2008-07-08</date>
+ <time>13:39:41</time>
  <version>
-  <release>0.18.7</release>
+  <release>0.19.0RC1</release>
   <api>0.18.0</api>
  </version>
  <stability>
-  <release>alpha</release>
+  <release>devel</release>
   <api>alpha</api>
  </stability>
  <license uri="http://www.php.net/license">PHP License</license>
- <notes>Bugfix release
- * fix Bug #3: REST.php variable name mismatch (Brett Bieber),
- * fix Bug #11: Category update doesn't update category details (Marek Kuziel),
- * fix Bug #30: needed extensions not listed in package.xml (Brett Bieber),
- * fix Bug #19: warnings on delete of a release (Brett Bieber),
- * fix Bug #34: License URI gets lost when creating a package (Brett Bieber),
- * fix Bug #33: FIX for mysql ERROR 1071 (42000) (Brett Bieber),
- * fix Bug #20: upload release of Chiara_Bugs resets leads (Brett Bieber),
- * fix Bug #29: Unable to open 'My Account' (Brett Bieber),
- * fix Bug #35: massive Packages Category REST is *not* saved on release (Greg Beaver)
- * fix Bug #36: deps are sorted in reverse order in packagesinfo.xml (Greg Beaver)
- * fix Bug #37: packagesinfo.xml is not generated on release delete either (Greg Beaver)
- * fix Bug #38: if there are no releases, allreleases.xml is not updated to show this (Greg Beaver),
- * fix Bug #39: multiple channels elicits notices on login page (Greg Beaver).</notes>
+ <notes>PLEASE BACKUP YOUR EXISTING CHANNEL BEFORE UPDATING!
+
+Feature/Bugfix Release
+Bug #43  	 Edit maintainer doesn't save admin value. [bbieber]
+Bug #27  	 use MDB2_Schema for managing the database in post-install script [bbieber]
+Bug #31  	 Stock install fails : Table 'pear.packages' doesn't exist [bbieber] 
+
+Features:
+* Admins can now set passwords for other users. [cweiske]
+* Add new packages and maintainers on upload. [cweiske]</notes>
  <contents>
   <dir baseinstalldir="Chiara/PEAR" name="/">
-   <file baseinstalldir="Chiara/PEAR" md5sum="25731be0a687a8b1c13311953d02495d" name="data/DBDataObject/pearserver.ini" role="data"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="9245dd65f9a98d7e372736b5f7f428a9" name="data/deprecatedpackages-chiara_pear_server-0.17.0.sql" role="data"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="854d541ec870d5b0f9a2860a08972849" name="data/handles-channel-0.18.2.sql" role="data"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="d191a3016b4af8825c5e4a6b76854fb7" name="data/maintainer-0.19.0.sql" role="data"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="2bd3b4af7eec28c57fb27c76666a24f8" name="data/maintainers-channel-0.18.4.sql" role="data"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="c082d3730bef05db9d0710945a6c03fd" name="data/package_extras-0.19.0.sql" role="data"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="fbdba6061dc6306c4ab6ba6abd12fe64" name="data/package_extras_fixvalues-0.18.5.sql" role="data"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="7e6a2d0b26f6d58eeaeff2503e551b9c" name="data/package_extras_keys-0.18.5.sql" role="data"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="880601a28c6cc98a38a363554ff24e3d" name="data/package_extras_missingvalues-0.18.5.sql" role="data"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="e1876205b4efa800c0c7477d3372448f" name="data/pearserver.sql" role="data"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="73cf7006a8e0825da5ab6bfb7794f1fa" name="data/pear_server.css" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="7b436050733a8395390e7d8d85380694" name="data/DBDataObject/pearserver.ini" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="7b506831e29652d15165f71f3fb705ac" name="data/deprecatedpackages-chiara_pear_server-0.17.0.sql" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="41f1a2673d97db649944df9198e19a49" name="data/handles-channel-0.18.2.sql" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="2a4e3abf64a73a03242a7e6d2de6baed" name="data/maintainer-0.19.0.sql" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="b074733015dd02b1d36cc67694206e26" name="data/maintainers-channel-0.18.4.sql" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="d2e518886f8dd43a309f9f6e9892e389" name="data/package_extras-0.19.0.sql" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="2f5ca6c02f19f824b863853fa1f873c9" name="data/package_extras_fixvalues-0.18.5.sql" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="921b76cdc5f9c601fd9011a261b5cd38" name="data/package_extras_keys-0.18.5.sql" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="cb851ff1c0c64388983822a99a910f29" name="data/package_extras_missingvalues-0.18.5.sql" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="19cfe6200b0ccfc7a8e755818983f8d3" name="data/pearserver.sql" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="ff4609232e4ab22dba7af0b71f407a1a" name="data/pear_server.css" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="c8727151021b67366e1abe2b2cc3f8f9" name="data/restsupport-0.18.0.sql" role="data"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="07ba3a53b03a622fb560e3cdbc30093a" name="data/upgrade-0.12.0_0.13.0.sql" role="data"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="4110a5fe9147a91cf149c1535186e9c6" name="examples/xmlrpc.php" role="doc"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="1db94913761d31de34b7dfd5449c4fb5" name="Server/Backend/DBDataObject/Categories.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="30efeea0aae2b9b992cbffa1b29e0848" name="Server/Backend/DBDataObject/Channels.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="e26fa46a8811319c6b44a11cee66bce3" name="Server/Backend/DBDataObject/Handles.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="1e388122551a3d5ab18942ea20f66cf9" name="Server/Backend/DBDataObject/Maintainers.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="06d90ce23030bb8035bfd2d9971042d9" name="Server/Backend/DBDataObject/Packages.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="fdbd3dbc58cf9f332d0512a590fbb125" name="Server/Backend/DBDataObject/Package_extras.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="041e1eeef782fa9000772f3bece2775a" name="Server/Backend/DBDataObject/Releases.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="6b6165c4013727c1f875ecdda4bae2fc" name="Server/Backend/DBDataObject.php" role="php">
+   <file baseinstalldir="Chiara/PEAR" md5sum="d2dd4eaa628f62216bee7f9b268b5063" name="data/upgrade-0.12.0_0.13.0.sql" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="81099ab59c96d7116d681f99be3cab41" name="examples/xmlrpc.php" role="doc"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="707c4d7f877a2d9be3dfac460b4d5e8f" name="Server/Backend/DBDataObject/Categories.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="7b6aa9d01798039b408cb39b33a42bb6" name="Server/Backend/DBDataObject/Channels.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="5871fe5e89e77fb5d1cab748dadb582e" name="Server/Backend/DBDataObject/Handles.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="940c252b286033814bfd67e1e31d3038" name="Server/Backend/DBDataObject/Maintainers.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="79eef1e939b29c8db5417d60d1e65fa5" name="Server/Backend/DBDataObject/Packages.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="340f2e529b96ca354464a71b12c9aaff" name="Server/Backend/DBDataObject/Package_extras.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="5b3ece3f963e2c455bf8c7cfa5ecf962" name="Server/Backend/DBDataObject/Releases.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="1db90009c3b4e031a8e539d495139cd1" name="Server/Backend/DBDataObject.php" role="php">
     <tasks:replace from="@php-dir@" to="php_dir" type="pear-config"/>
     <tasks:replace from="@data-dir@" to="data_dir" type="pear-config"/>
    </file>
-   <file baseinstalldir="Chiara/PEAR" md5sum="2539306da4eb4d903faaaa64c13dcca9" name="Server/Frontend/Savant3/login.tpl.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="f2d83a84b8b62eb4242a4112e76bb865" name="Server/Frontend/HTMLQuickForm.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="4f3b86384c2d3cbd61ccd1fef8407d66" name="Server/Frontend/Savant3.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="bfd4a2c606e4bf8e8d9dedcc308f5bca" name="Server/Backend.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="8911ad27bd432675917864a63b59fc41" name="Server/Exception.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="e7c92c79ed7d708a2e67b66dbdb62daf" name="Server/Frontend.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="dc6ac839a9504dab4dee976cbd349069" name="Server/Maintainer.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="89d189f9d69c71cb89b463fbe2242873" name="Server/mysqlinstall.php" role="php">
+   <file baseinstalldir="Chiara/PEAR" md5sum="f74fb0ccb33d4bf9be27a0ae143dda66" name="Server/docs/examples/index.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="dd36b07e1b5914f377078ad5b395337b" name="Server/Frontend/Savant3/login.tpl.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="750e7f240183779643d2c6bba6ec501e" name="Server/Frontend/HTMLQuickForm.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="57d1a21b471f0894847d99fb4b6732e6" name="Server/Frontend/Savant3.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="d10cccb8d247387cf1d9284b33cc3da0" name="Server/Backend.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="09a8b56ea096454e3401f00e5f3ae8ec" name="Server/Exception.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="05a48280d79f3696dc3c1854463e5a7e" name="Server/Frontend.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="19712c0fdcda630eb90e3e281d54673f" name="Server/Maintainer.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="2d999d52bd0b8f2e8591bf887a11ffea" name="Server/Package.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="d77e527ccdc015bfaf1fcdf61b730646" name="Server/Release.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="aa094de16b9ef2a3bf563d8ad2a74517" name="Server/REST.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="27a050a1838657264f7d4194a7100c23" name="Chiara_PEAR_Server_Database.php" role="php">
     <tasks:replace from="@php-dir@" to="php_dir" type="pear-config"/>
     <tasks:replace from="@data-dir@" to="data_dir" type="pear-config"/>
     <tasks:postinstallscript>
@@ -103,20 +109,26 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
      <tasks:paramgroup>
       <tasks:id>databaseSetup</tasks:id>
       <tasks:param>
+       <tasks:name>dbtype</tasks:name>
+       <tasks:prompt>Database type</tasks:prompt>
+       <tasks:type>string</tasks:type>
+       <tasks:default>mysqli</tasks:default>
+      </tasks:param>
+      <tasks:param>
        <tasks:name>database</tasks:name>
-       <tasks:prompt>Mysql database</tasks:prompt>
+       <tasks:prompt>Database name</tasks:prompt>
        <tasks:type>string</tasks:type>
        <tasks:default>pear</tasks:default>
       </tasks:param>
       <tasks:param>
        <tasks:name>user</tasks:name>
-       <tasks:prompt>Mysql Username (must have create permision)</tasks:prompt>
+       <tasks:prompt>Database Username (must have create permision)</tasks:prompt>
        <tasks:type>string</tasks:type>
        <tasks:default>pear</tasks:default>
       </tasks:param>
       <tasks:param>
        <tasks:name>password</tasks:name>
-       <tasks:prompt>Mysql password</tasks:prompt>
+       <tasks:prompt>Database password</tasks:prompt>
        <tasks:type>string</tasks:type>
        <tasks:default>pear</tasks:default>
       </tasks:param>
@@ -182,13 +194,15 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
       </tasks:param>
       <tasks:param>
        <tasks:name>frontendphp</tasks:name>
-       <tasks:prompt>name of frontend.php HTML admin frontend file</tasks:prompt>
+       <tasks:prompt>Name of HTML admin frontend file</tasks:prompt>
        <tasks:type>string</tasks:type>
+       <tasks:default>admin.php</tasks:default>
       </tasks:param>
       <tasks:param>
        <tasks:name>uploadpath</tasks:name>
        <tasks:prompt>temporary path to save uploaded releases in</tasks:prompt>
        <tasks:type>string</tasks:type>
+       <tasks:default>/tmp</tasks:default>
       </tasks:param>
       <tasks:param>
        <tasks:name>port</tasks:name>
@@ -205,17 +219,16 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
      </tasks:paramgroup>
     </tasks:postinstallscript>
    </file>
-   <file baseinstalldir="Chiara/PEAR" md5sum="d2f5bf50575065424870baaee1bdd196" name="Server/Package.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="08b62c980b5c2b230a19ddbc69f6a190" name="Server/Release.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="c03477cb1e9a782c3615abff54a68b4c" name="Server/REST.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="64dab43dc0edd0e3eb8e0bdc90dfef2b" name=".cvsignore" role="data"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="758c5194cc64e2133307ff357c06ffaf" name="Server.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="1acd48da944783f8cc8892d2a0009c38" name="database-0.18.7.xml" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="1acd48da944783f8cc8892d2a0009c38" name="database.xml" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="9f8a0993c106243363c83934474859fc" name="db_setup_test.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="c2ec9449a452eb08ce17e00d402e4a88" name="Server.php" role="php"/>
   </dir>
  </contents>
  <dependencies>
   <required>
    <php>
-    <min>5.0.0</min>
+    <min>5.1.6</min>
    </php>
    <pearinstaller>
     <min>1.4.3</min>
@@ -226,9 +239,24 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
     <min>1.7.12</min>
    </package>
    <package>
+    <name>MDB2_Schema</name>
+    <channel>pear.php.net</channel>
+    <min>0.6.0</min>
+   </package>
+   <package>
+    <name>MDB2</name>
+    <channel>pear.php.net</channel>
+    <min>2.2.0</min>
+   </package>
+   <package>
     <name>HTML_QuickForm</name>
     <channel>pear.php.net</channel>
     <min>3.2.2</min>
+   </package>
+   <package>
+    <name>HTML_Table</name>
+    <channel>pear.php.net</channel>
+    <min>1.0</min>
    </package>
    <extension>
     <name>zlib</name>
@@ -256,9 +284,9 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
   </optional>
   <group hint="Public frontend for users to browse channel packages" name="pearweb">
    <package>
-    <name>Crtx_PEAR_Channel_Frontend</name>
-    <channel>pear.crtx.org</channel>
-    <min>0.1.1</min>
+    <name>Chiara_PEAR_Server_Web</name>
+    <channel>pear.chiaraquartet.net</channel>
+    <min>0.4.0</min>
    </package>
   </group>
  </dependencies>
@@ -644,6 +672,48 @@ fix invalid release exception error message</notes>
  * fix Bug #37: packagesinfo.xml is not generated on release delete either (Greg Beaver)
  * fix Bug #38: if there are no releases, allreleases.xml is not updated to show this (Greg Beaver),
  * fix Bug #39: multiple channels elicits notices on login page (Greg Beaver).</notes>
+  </release>
+  <release>
+   <version>
+    <release>0.19.0</release>
+    <api>0.18.0</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2008-06-26</date>
+   <license uri="http://www.php.net/license">PHP License</license>
+   <notes>Feature/Bugfix Release
+Bug #43  	 Edit maintainer doesn&amp;#180;t save admin value. [bbieber]
+Bug #27  	 use MDB2_Schema for managing the database in post-install script [bbieber]
+Bug #31  	 Stock install fails : Table 'pear.packages' doesn't exist [bbieber] 
+
+Features:
+* Admins can now set passwords for other users. [cweiske]
+* Add new packages and maintainers on upload. [cweiske]</notes>
+  </release>
+  <release>
+   <version>
+    <release>0.19.0RC1</release>
+    <api>0.18.0</api>
+   </version>
+   <stability>
+    <release>devel</release>
+    <api>alpha</api>
+   </stability>
+   <date>2008-07-08</date>
+   <license uri="http://www.php.net/license">PHP License</license>
+   <notes>PLEASE BACKUP YOUR EXISTING CHANNEL BEFORE UPDATING!
+
+Feature/Bugfix Release
+Bug #43  	 Edit maintainer doesn't save admin value. [bbieber]
+Bug #27  	 use MDB2_Schema for managing the database in post-install script [bbieber]
+Bug #31  	 Stock install fails : Table 'pear.packages' doesn't exist [bbieber] 
+
+Features:
+* Admins can now set passwords for other users. [cweiske]
+* Add new packages and maintainers on upload. [cweiske]</notes>
   </release>
  </changelog>
 </package>

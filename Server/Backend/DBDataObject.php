@@ -3,7 +3,7 @@ require_once 'DB/DataObject.php';
 require_once 'Chiara/PEAR/Server/Backend.php';
 require_once 'Chiara/PEAR/Server/Exception.php';
 /**
- * @version $Id: DBDataObject.php 256 2006-08-20 02:18:24Z cellog $
+ * @version $Id: DBDataObject.php 275 2007-03-29 22:06:56Z bbieber $
  * @author Greg Beaver <cellog@php.net>
  */
 class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
@@ -738,6 +738,7 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
         if ($handle->find()) {
             throw new Chiara_PEAR_Server_ExceptionMaintainerExists($handle->handle);
         }
+        $handle->admin = $maintainer->admin;
         $handle->email = $maintainer->email;
         $handle->name = $maintainer->name;
         $handle->password = md5($maintainer->password);

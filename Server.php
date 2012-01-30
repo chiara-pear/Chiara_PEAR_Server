@@ -104,13 +104,115 @@ class Chiara_PEAR_Server
     }
 
     /**
+     * Create package maintainers from the given release.
+     *
+     * @param Chiara_PEAR_Server_Release $release Uploaded release
+     */
+    protected function addMaintainersFromRelease($release)
+    {
+        $ppackage = $release->getPackageInfo();
+        $backend  = $this->_backend[$release->getChannel()];
+
+        foreach ($ppackage->getMaintainers() as $maintainer) {
+            $maint = new Chiara_PEAR_Server_MaintainerPackage();
+            $maint->channel  = $ppackage->getChannel();
+            $maint->package  = $ppackage->getName();//$servpack->name;//NOT package->getTitle() because $servpack already has a "validated" name
+            $maint->name     = $maintainer['name'];
+            $maint->handle   = $maintainer['handle'];
+            $maint->email    = $maintainer['email'];
+            $maint->role     = $maintainer['role'];
+            $maint->active   = $maintainer['active'] == 'yes';
+            $maint->password = md5('ohisitsolate' . time());
+            try {
+                //maintainer handle, random password
+                $backend->addMaintainer($maint);
+            } catch (Exception $e) {
+                //what to do here?
+            }
+            try {
+                //maintainer for the package
+                $backend->addPackageMaintainer($maint);
+            } catch (Exception $e) {
+                //what to do here?
+            }
+        }
+    }
+
+    /**
+     * Create a package in the database from the given release
+     *
+     * @param Chiara_PEAR_Server_Release $release Uploaded release
+     *
+     * @return boolean True if all went well
+     * @throws Chiara_PEAR_Server_ExceptionCannotAddPackage When package cannot
+     *         be added
+     */
+    protected function addPackageFromRelease($release)
+    {
+        $ppackage = $release->getPackageInfo();
+        $backend  = $this->_backend[$release->getChannel()];
+
+        $spack = new Chiara_PEAR_Server_Package();
+        $spack->name        = $ppackage->getName();
+        $spack->channel     = $ppackage->getChannel();
+        $spack->license     = $ppackage->getLicense();
+        $spack->license_uri = $ppackage->getLicenseLocation();
+        $spack->summary     = $ppackage->getSummary();
+        $spack->description = $ppackage->getDescription();
+        $spack->parent      = '';
+        $spack->category_id = self::findCategoryId($ppackage->getName(), $backend);
+        $spack->bugs_uri    = '';
+        $spack->docs_uri    = '';
+        $spack->cvs_uri     = '';
+
+        if (!$backend->addPackage($spack)) {
+            throw new Chiara_PEAR_Server_ExceptionCannotAddPackage();
+        }
+
+        return true;
+    }
+
+    /**
+     * Finds a suitable category ID for the given name
+     *
+     * @param string                     $name    Package name
+     * @param Chiara_PEAR_Server_Backend $backend Data backend
+     *
+     * @return integer Category ID
+     */
+    protected static function findCategoryId($name, $backend)
+    {
+        $categories = $backend->listCategories();
+        $matches = array();
+        foreach ($categories as $category) {
+            if (substr($name, 0, strlen($category['name'])) == $category['name']) {
+                $matches[strlen($category['name'])] = $category['id'];
+            }
+        }
+        if (count($matches) == 0) {
+            return $categories[0]['id'];
+        }
+        krsort($matches);
+        return reset($matches);
+    }
+
+    /**
      * @param Chiara_PEAR_Server_Release
      * @param bool if true, then the temporary uploaded release will be deleted
      */
-    public function addRelease($release, $deleterelease = true)
-    {
+    public function addRelease(
+        $release, $deleterelease = true, $createpackage = false, $createuser = false
+    ) {
         if ($this->_validLocalChannel($channel = $release->getChannel())) {
+            if ($createpackage
+                && !$this->_backend[$channel]->validPackage($release->getPackage())
+            ) {
+                $this->addPackageFromRelease($release);
+            }
             if ($this->_backend[$channel]->validPackage($release->getPackage())) {
+                if ($createuser) {
+                    $this->addMaintainersFromRelease($release);
+                }
                 if ($release->validate()) {
                     // copy .tgz and .tar to destination directory
                     $archive = $release->getFilepath();

@@ -104,7 +104,15 @@ class Chiara_PEAR_Server_Release
     {
         return $this->_packageInfo->getMaintainers();
     }
-    
+
+    /**
+     * @return PEAR_PackageFile
+     */
+    public function getPackageInfo()
+    {
+        return $this->_packageInfo;
+    }
+
     public function getReleasingMaintainer()
     {
         return $this->_releaser;

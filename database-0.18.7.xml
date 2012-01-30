@@ -1,0 +1,625 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<database>
+
+ <name>pearserver</name>
+ <create>true</create>
+ <overwrite>false</overwrite>
+
+ <table>
+
+  <name>categories</name>
+
+  <declaration>
+
+   <field>
+    <name>id</name>
+    <type>integer</type>
+    <unsigned>true</unsigned>
+    <length>4</length>
+    <notnull>true</notnull>
+    <default>0</default>
+    <autoincrement>1</autoincrement>
+   </field>
+
+   <field>
+    <name>channel</name>
+    <type>text</type>
+    <length>255</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>name</name>
+    <type>text</type>
+    <length>255</length>
+    <notnull>true</notnull>
+   </field>
+
+   <field>
+    <name>description</name>
+    <type>clob</type>
+    <notnull>true</notnull>
+   </field>
+
+   <field>
+    <name>alias</name>
+    <type>text</type>
+    <length>50</length>
+    <notnull>false</notnull>
+   </field>
+
+   <index>
+    <name>PRIMARY</name>
+    <primary>true</primary>
+    <field>
+     <name>id</name>
+     <sorting>ascending</sorting>
+    </field>
+   </index>
+
+  </declaration>
+
+ </table>
+
+ <sequence>
+  <name>categories</name>
+  <on>
+   <table>categories</table>
+   <field>id</field>
+  </on>
+ </sequence>
+
+ <table>
+
+  <name>channels</name>
+
+  <declaration>
+
+   <field>
+    <name>channel</name>
+    <type>text</type>
+    <length>255</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>summary</name>
+    <type>text</type>
+    <length>255</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>alias</name>
+    <type>text</type>
+    <length>100</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>rest_support</name>
+    <type>integer</type>
+    <length>4</length>
+    <notnull>true</notnull>
+    <default>0</default>
+   </field>
+
+   <field>
+    <name>validatepackage</name>
+    <type>text</type>
+    <length>255</length>
+    <notnull>false</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>validatepackageversion</name>
+    <type>text</type>
+    <length>25</length>
+    <notnull>false</notnull>
+    <default></default>
+   </field>
+
+   <index>
+    <name>PRIMARY</name>
+    <primary>true</primary>
+    <field>
+     <name>channel</name>
+     <sorting>ascending</sorting>
+    </field>
+   </index>
+
+  </declaration>
+
+ </table>
+
+ <table>
+
+  <name>handles</name>
+
+  <declaration>
+
+   <field>
+    <name>channel</name>
+    <type>text</type>
+    <length>255</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>handle</name>
+    <type>text</type>
+    <length>20</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>name</name>
+    <type>text</type>
+    <length>255</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>email</name>
+    <type>text</type>
+    <length>255</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>uri</name>
+    <type>text</type>
+    <length>255</length>
+    <notnull>false</notnull>
+   </field>
+
+   <field>
+    <name>description</name>
+    <type>clob</type>
+    <notnull>false</notnull>
+   </field>
+
+   <field>
+    <name>wishlist</name>
+    <type>text</type>
+    <length>255</length>
+    <notnull>false</notnull>
+   </field>
+
+   <field>
+    <name>password</name>
+    <type>text</type>
+    <length>50</length>
+    <notnull>true</notnull>
+   </field>
+
+   <field>
+    <name>admin</name>
+    <type>integer</type>
+    <length>4</length>
+    <notnull>true</notnull>
+    <default>0</default>
+   </field>
+
+   <index>
+    <name>PRIMARY</name>
+    <primary>true</primary>
+    <field>
+     <name>channel</name>
+     <sorting>ascending</sorting>
+    </field>
+    <field>
+     <name>handle</name>
+     <sorting>ascending</sorting>
+    </field>
+   </index>
+
+  </declaration>
+
+ </table>
+
+ <table>
+
+  <name>maintainers</name>
+
+  <declaration>
+
+   <field>
+    <name>handle</name>
+    <type>text</type>
+    <length>20</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>channel</name>
+    <type>text</type>
+    <length>255</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>package</name>
+    <type>text</type>
+    <length>80</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>role</name>
+    <type>text</type>
+    <length>30</length>
+    <notnull>true</notnull>
+    <default>lead</default>
+   </field>
+
+   <field>
+    <name>active</name>
+    <type>integer</type>
+    <length>1</length>
+    <notnull>true</notnull>
+    <default>1</default>
+   </field>
+
+   <index>
+    <name>PRIMARY</name>
+    <primary>true</primary>
+    <field>
+     <name>handle</name>
+     <sorting>ascending</sorting>
+    </field>
+    <field>
+     <name>channel</name>
+     <sorting>ascending</sorting>
+    </field>
+    <field>
+     <name>package</name>
+     <sorting>ascending</sorting>
+    </field>
+   </index>
+
+  </declaration>
+
+ </table>
+
+ <table>
+
+  <name>package_extras</name>
+
+  <declaration>
+
+   <field>
+    <name>channel</name>
+    <type>text</type>
+    <length>255</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>package</name>
+    <type>text</type>
+    <length>80</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>cvs_uri</name>
+    <type>text</type>
+    <length>255</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>bugs_uri</name>
+    <type>text</type>
+    <length>255</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>docs_uri</name>
+    <type>text</type>
+    <length>255</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>qa_approval</name>
+    <type>boolean</type>
+    <notnull>true</notnull>
+    <default>0</default>
+   </field>
+
+   <field>
+    <name>unit_tested</name>
+    <type>boolean</type>
+    <notnull>true</notnull>
+    <default>0</default>
+   </field>
+
+   <index>
+    <name>PRIMARY</name>
+    <primary>true</primary>
+    <field>
+     <name>channel</name>
+     <sorting>ascending</sorting>
+    </field>
+    <field>
+     <name>package</name>
+     <sorting>ascending</sorting>
+    </field>
+   </index>
+
+  </declaration>
+
+ </table>
+
+ <table>
+
+  <name>packages</name>
+
+  <declaration>
+
+   <field>
+    <name>channel</name>
+    <type>text</type>
+    <length>255</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>category_id</name>
+    <type>integer</type>
+    <length>4</length>
+    <notnull>true</notnull>
+    <default>0</default>
+   </field>
+
+   <field>
+    <name>package</name>
+    <type>text</type>
+    <length>80</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>license</name>
+    <type>text</type>
+    <length>20</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>licenseuri</name>
+    <type>text</type>
+    <length>150</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>summary</name>
+    <type>clob</type>
+    <notnull>true</notnull>
+   </field>
+
+   <field>
+    <name>description</name>
+    <type>clob</type>
+    <notnull>true</notnull>
+   </field>
+
+   <field>
+    <name>parent</name>
+    <type>text</type>
+    <length>80</length>
+    <notnull>false</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>deprecated_package</name>
+    <type>text</type>
+    <length>80</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>deprecated_channel</name>
+    <type>text</type>
+    <length>255</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <index>
+    <name>PRIMARY</name>
+    <primary>true</primary>
+    <field>
+     <name>channel</name>
+     <sorting>ascending</sorting>
+    </field>
+    <field>
+     <name>package</name>
+     <sorting>ascending</sorting>
+    </field>
+   </index>
+
+  </declaration>
+
+ </table>
+
+ <table>
+
+  <name>releases</name>
+
+  <declaration>
+
+   <field>
+    <name>id</name>
+    <type>integer</type>
+    <unsigned>true</unsigned>
+    <length>4</length>
+    <notnull>true</notnull>
+    <default>0</default>
+    <autoincrement>1</autoincrement>
+   </field>
+
+   <field>
+    <name>channel</name>
+    <type>text</type>
+    <length>255</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>package</name>
+    <type>text</type>
+    <length>80</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>version</name>
+    <type>text</type>
+    <length>20</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>state</name>
+    <type>text</type>
+    <length>8</length>
+    <notnull>true</notnull>
+    <default>stable</default>
+   </field>
+
+   <field>
+    <name>maintainer</name>
+    <type>text</type>
+    <length>20</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>license</name>
+    <type>text</type>
+    <length>20</length>
+    <notnull>true</notnull>
+    <default></default>
+   </field>
+
+   <field>
+    <name>summary</name>
+    <type>clob</type>
+    <notnull>true</notnull>
+   </field>
+
+   <field>
+    <name>description</name>
+    <type>clob</type>
+    <notnull>true</notnull>
+   </field>
+
+   <field>
+    <name>releasedate</name>
+    <type>timestamp</type>
+    <notnull>true</notnull>
+    <default>0000-00-00 00:00:00</default>
+   </field>
+
+   <field>
+    <name>releasenotes</name>
+    <type>clob</type>
+    <notnull>true</notnull>
+   </field>
+
+   <field>
+    <name>filepath</name>
+    <type>clob</type>
+    <notnull>true</notnull>
+   </field>
+
+   <field>
+    <name>packagexml</name>
+    <type>clob</type>
+    <notnull>true</notnull>
+   </field>
+
+   <field>
+    <name>deps</name>
+    <type>clob</type>
+    <notnull>true</notnull>
+   </field>
+
+   <index>
+    <name>PRIMARY</name>
+    <primary>true</primary>
+    <field>
+     <name>id</name>
+     <sorting>ascending</sorting>
+    </field>
+   </index>
+   
+   <index>
+    <unique>true</unique>
+    <name>version</name>
+    <field>
+     <name>channel</name>
+    </field>
+    <field>
+     <name>package</name>
+    </field>
+    <field>
+     <name>version</name>
+    </field>
+   </index>
+   
+   <index>
+    <name>channel</name>
+    <field>
+     <name>channel</name>
+    </field>
+    <field>
+     <name>package</name>
+    </field>
+   </index>
+
+  </declaration>
+
+ </table>
+
+ <sequence>
+  <name>releases</name>
+  <on>
+   <table>releases</table>
+   <field>id</field>
+  </on>
+ </sequence>
+
+</database>
