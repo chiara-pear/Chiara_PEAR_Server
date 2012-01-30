@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" packagerversion="1.4.7" version="2.0" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
+<package xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" packagerversion="1.5.0a1" version="2.0" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
  <name>Chiara_PEAR_Server</name>
  <channel>chiara-local</channel>
  <summary>A lightweight pearweb-compatible channel server for hosting a PEAR channel</summary>
@@ -28,10 +28,10 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
   <email>clay@killersoft.com</email>
   <active>yes</active>
  </lead>
- <date>2006-02-03</date>
- <time>21:30:50</time>
+ <date>2006-04-09</date>
+ <time>16:18:10</time>
  <version>
-  <release>0.18.4</release>
+  <release>0.18.5</release>
   <api>0.18.0</api>
  </version>
  <stability>
@@ -39,16 +39,21 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
   <api>alpha</api>
  </stability>
  <license uri="http://www.php.net/license">PHP License</license>
- <notes>* Implement REST 1.1
-* re-factor backend to make more modular
-* fix channel field size in the database</notes>
+ <notes>* fix post-install script so it is never possible to delete an
+  existing channel database
+* fix data structure of package_extras table so we can update it
+* when setting up 2 channels in the same database, the administrator of an existing
+  channel is mistakenly used for the new channel as well in the post-install script</notes>
  <contents>
   <dir baseinstalldir="Chiara/PEAR" name="/">
-   <file baseinstalldir="Chiara/PEAR" md5sum="9c03de64449ab09c4c031cce668435d8" name="data/DBDataObject/pearserver.ini" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="25731be0a687a8b1c13311953d02495d" name="data/DBDataObject/pearserver.ini" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="9245dd65f9a98d7e372736b5f7f428a9" name="data/deprecatedpackages-chiara_pear_server-0.17.0.sql" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="854d541ec870d5b0f9a2860a08972849" name="data/handles-channel-0.18.2.sql" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="b074733015dd02b1d36cc67694206e26" name="data/maintainers-channel-0.18.4.sql" role="data"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="c35a54087c7da390df2fab73b50cc15f" name="data/pearserver.sql" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="fbdba6061dc6306c4ab6ba6abd12fe64" name="data/package_extras_fixvalues-0.18.5.sql" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="7e6a2d0b26f6d58eeaeff2503e551b9c" name="data/package_extras_keys-0.18.5.sql" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="880601a28c6cc98a38a363554ff24e3d" name="data/package_extras_missingvalues-0.18.5.sql" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="79f9b2ccf7586c0f172e302c3848ff30" name="data/pearserver.sql" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="73cf7006a8e0825da5ab6bfb7794f1fa" name="data/pear_server.css" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="c8727151021b67366e1abe2b2cc3f8f9" name="data/restsupport-0.18.0.sql" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="07ba3a53b03a622fb560e3cdbc30093a" name="data/upgrade-0.12.0_0.13.0.sql" role="data"/>
@@ -66,10 +71,10 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
    </file>
    <file baseinstalldir="Chiara/PEAR" md5sum="7be3af5b00b33f009009a46b8c914273" name="Server/Frontend/HTMLQuickForm.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="bfd4a2c606e4bf8e8d9dedcc308f5bca" name="Server/Backend.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="c5409863a5409f9a347a5be74102dcb8" name="Server/Exception.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="780235e3880066986a30fdeea8f52d9c" name="Server/Exception.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="e7c92c79ed7d708a2e67b66dbdb62daf" name="Server/Frontend.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="b45466760ee1535b6fde965bd4ca3c84" name="Server/Maintainer.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="a40d9525eba1df4a18f6755fad431b99" name="Server/mysqlinstall.php" role="php">
+   <file baseinstalldir="Chiara/PEAR" md5sum="af8efd8cefb0b3cb5631da677a2e156e" name="Server/mysqlinstall.php" role="php">
     <tasks:replace from="@php-dir@" to="php_dir" type="pear-config"/>
     <tasks:replace from="@data-dir@" to="data_dir" type="pear-config"/>
     <tasks:postinstallscript>
@@ -188,9 +193,9 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
     </tasks:postinstallscript>
    </file>
    <file baseinstalldir="Chiara/PEAR" md5sum="d2f5bf50575065424870baaee1bdd196" name="Server/Package.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="3135f04354e34e2e16e258730de99e31" name="Server/Release.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="e4a3657148aa14396ae95691ba0a688f" name="Server/Release.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="280f707a6c45441b073c325d5addf5e1" name="Server/REST.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="b94115dbf57e490579360aef8d348051" name="Server.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="6559ce25729b8f73bcf6e9770ba0508a" name="Server.php" role="php"/>
   </dir>
  </contents>
  <dependencies>
@@ -199,7 +204,7 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
     <min>5.0.0</min>
    </php>
    <pearinstaller>
-    <min>1.4.2</min>
+    <min>1.4.3</min>
    </pearinstaller>
    <package>
     <name>DB_DataObject</name>
@@ -544,6 +549,23 @@ fix invalid release exception error message</notes>
    <notes>* Implement REST 1.1
 * re-factor backend to make more modular
 * fix channel field size in the database</notes>
+  </release>
+  <release>
+   <version>
+    <release>0.18.5</release>
+    <api>0.18.0</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2006-04-09</date>
+   <license uri="http://www.php.net/license">PHP License</license>
+   <notes>* fix post-install script so it is never possible to delete an
+  existing channel database
+* fix data structure of package_extras table so we can update it
+* when setting up 2 channels in the same database, the administrator of an existing
+  channel is mistakenly used for the new channel as well in the post-install script</notes>
   </release>
  </changelog>
 </package>

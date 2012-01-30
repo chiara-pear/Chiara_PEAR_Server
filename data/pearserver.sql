@@ -1,6 +1,6 @@
 # Database : pearserver
 # --------------------------------------------------------
-# $Id: pearserver.sql,v 1.12 2006/02/04 02:55:09 cellog Exp $
+# $Id: pearserver.sql,v 1.13 2006/04/09 22:06:38 cellog Exp $
 # --------------------------------------------------------
 
 #
@@ -80,12 +80,13 @@ CREATE TABLE maintainers (
 
 CREATE TABLE package_extras (
   channel varchar(255) NOT NULL default '',
-  package varchar(80) default NULL,
+  package varchar(80) NOT NULL default '',
   cvs_uri varchar(255) NOT NULL default '',
   bugs_uri varchar(255) NOT NULL default '',
   docs_uri varchar(255) NOT NULL default '',
-  qa_approval int(1) default NULL,
-  unit_tested int(1) default NULL
+  qa_approval int(1) NOT NULL default 0,
+  unit_tested int(1) NOT NULL default 0,
+  PRIMARY KEY (channel, package)
 );
 # --------------------------------------------------------
 

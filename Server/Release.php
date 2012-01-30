@@ -18,7 +18,7 @@ class Chiara_PEAR_Server_Release
      */
     protected $_xml;
     
-    public function Chiara_PEAR_Server_Release($path, $releaser, $conf, $tmpdir)
+    public function Chiara_PEAR_Server_Release($path, $releaser, $conf, $tmpdir = false)
     {
         $this->_packageFile = $path;
         $pkg = new PEAR_PackageFile($conf, false, $tmpdir);

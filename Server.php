@@ -105,8 +105,9 @@ class Chiara_PEAR_Server
 
     /**
      * @param Chiara_PEAR_Server_Release
+     * @param bool if true, then the temporary uploaded release will be deleted
      */
-    public function addRelease($release)
+    public function addRelease($release, $deleterelease = true)
     {
         if ($this->_validLocalChannel($channel = $release->getChannel())) {
             if ($this->_backend[$channel]->validPackage($release->getPackage())) {
@@ -116,16 +117,20 @@ class Chiara_PEAR_Server
                     $new = $this->_releaseDir . DIRECTORY_SEPARATOR .
                         $release->getPackage() . '-' . $release->getVersion();
                     $gp = gzopen($archive, 'rb');
-                    $contents = '';
-                    while(!gzeof($gp)) {
-                        $contents .= gzread($gp, filesize($archive));
+                    if (!$gp) {
+                        throw new Chiara_PEAR_Server_ExceptionCannotOpenRelease($archive);
                     }
-                    gzclose($gp);
                     $fp = fopen($new . '.tar', 'wb');
-                    fwrite($fp, $contents);
-                    fclose($fp);
-                    copy($release->getFilepath(), $new . '.tgz');
-                    unlink($release->getFilepath());
+                    if (!$fp) {
+                        throw new Chiara_PEAR_Server_ExceptionCannotSaveRelease($new . '.tar');
+                    }
+                    stream_copy_to_stream($gp, $fp);
+                    if (!copy($release->getFilepath(), $new . '.tgz')) {
+                        throw new Chiara_PEAR_Server_ExceptionCannotSaveRelease($new . '.tgz');
+                    }
+                    if ($deleterelease) {
+                        unlink($release->getFilepath());
+                    }
                     // for the database, save the .tgz
                     $release->setFilepath($new . '.tgz');
                 } else {

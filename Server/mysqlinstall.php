@@ -187,7 +187,8 @@ class Server_mysqlinstall_postinstall
         if (extension_loaded('mysqli')) {
             $query = mysqli_select_db($conn, $this->db);
             $query = mysqli_query($conn, 'SELECT handle FROM handles WHERE handle = "' .
-                mysqli_real_escape_string($conn, $this->handle) . '"');
+                mysqli_real_escape_string($conn, $this->handle) . '" AND channel = "' .
+                mysqli_real_escape_string($conn, $this->channel) . '"');
             if (mysqli_num_rows($query)) {
                 $this->_ui->skipParamGroup('administrator');
             }
@@ -199,7 +200,8 @@ class Server_mysqlinstall_postinstall
         } else {
             $query = mysql_select_db($this->db, $conn);
             $query = mysql_query('SELECT handle FROM handles WHERE handle = "' .
-                mysql_real_escape_string($this->handle, $conn) . '"', $conn);
+                mysql_real_escape_string($this->handle, $conn) . '" AND channel = "' .
+                mysql_real_escape_string($this->channel, $conn) . '"', $conn);
             if (mysql_num_rows($query)) {
                 $this->_ui->skipParamGroup('administrator');
             }
@@ -280,163 +282,194 @@ class Server_mysqlinstall_postinstall
         } else {
             $query = mysql_select_db($this->db, $conn);
         }
-        if ($this->lastversion !== null) {        
-            if ($this->lastversion) {
-                if ($query) {
-                    // upgrading?
-                    // Deprecated packages upgrade
-                    if (extension_loaded('mysqli')) {
-                        $query = @mysqli_query($conn, 'SELECT deprecated_package FROM packages');
-                    } else {
-                        $query = @mysql_query('SELECT deprecated_package FROM packages', $conn);
-                    }
-                    if (!$query) {
-                        $a = $this->updateDatabase(
-                 '@data-dir@/Chiara_PEAR_Server/data/deprecatedpackages-chiara_pear_server-0.17.0.sql',
-                 'updating database to add deprecated package support', $conn);
-                        if (!$a) {
-                            return $a;
-                        }
-                    }
-                    // handles-channel upgrade
-                    if (extension_loaded('mysqli')) {
-                        $query = @mysqli_query($conn, 'SELECT channel FROM handles');
-                    } else {
-                        $query = @mysql_query('SELECT channel FROM handles', $conn);
-                    }
-                    if (!$query) {
-                        $a = $this->updateDatabase(
-                            '@data-dir@/Chiara_PEAR_Server/data/handles-channel-0.18.2.sql',
-                            'updating database to add support for grouping handles by channel', $conn);
-                        if (!$a) {
-                            return $a;
-                        }
-                        $this->fixHandles = true;
-                    }
-                    // channel field size upgrade
-                    if (extension_loaded('mysqli')) {
-                        $query = @mysqli_query($conn, 'SHOW COLUMNS FROM maintainers');
-                        while ($res = mysqli_fetch_array($query, MYSQLI_ASSOC)) {
-                            if ($res['Field'] == 'channel') {
-                                if ($res['Type'] == 'varchar(255)') {
-                                    $upgraded = true;
-                                } else {
-                                    $upgraded = false;
-                                }
-                            }
-                        }
-                    } else {
-                        $query = @mysql_query('SHOW COLUMNS FROM maintainers', $conn);
-                        while ($res = mysql_fetch_array($query, MYSQLI_ASSOC)) {
-                            if ($res['Field'] == 'channel') {
-                                if ($res['Type'] == 'varchar(255)') {
-                                    $upgraded = true;
-                                } else {
-                                    $upgraded = false;
-                                }
-                            }
-                        }
-                    }
-                    if (!$upgraded) {
-                        $a = $this->updateDatabase(
-                            '@data-dir@/Chiara_PEAR_Server/data/maintainers-channel-0.18.4.sql',
-                            'updating database to increase size of channel field', $conn);
-                        if (!$a) {
-                            return $a;
-                        }
-                    }
-                    // REST support upgrade
-                    if (extension_loaded('mysqli')) {
-                        $query = @mysqli_query($conn, 'SELECT rest_support FROM channels');
-                    } else {
-                        $query = @mysql_query('SELECT rest_support FROM channels', $conn);
-                    }
-                    if (!$query) {
-                        $a = $this->updateDatabase(
-                            '@data-dir@/Chiara_PEAR_Server/data/restsupport-0.18.0.sql',
-                            'updating database to add REST xml support', $conn);
-                        if (!$a) {
-                            return $a;
-                        }
-                    }
-                    // Categories support upgrade
-                    if (extension_loaded('mysqli')) {
-                        $check = @mysqli_query($conn, 'SELECT * FROM categories');
-                    } else {
-                        $check = @mysql_query('SELECT * FROM categories', $conn);
-                    }
-                    if ($check) {
-                        $this->_ui->outputData('database is already upgraded');
-                        $this->closeDB($conn);
-                        return $this->checkSetup(); // tables already updated
-                    }
-                    if (extension_loaded('mysqli')) {
-                        $query = mysqli_select_db($conn, $answers['database']);
-                    } else {
-                        $query = mysql_select_db($answers['database'], $conn);
-                    }
-                    if ($query) {
-                        $a = $this->updateDatabase(
-                            '@data-dir@/Chiara_PEAR_Server/data/upgrade-0.12.0_0.13.0.sql', false, $conn);
-                        if (!$a) {
-                            $this->closeDB($conn);
-                            return $a;
-                        }
-                    }
-                    return $this->checkSetup();
-                }
+        if ($query) {
+            // upgrading?
+            // Deprecated packages upgrade
+            if (extension_loaded('mysqli')) {
+                $query = @mysqli_query($conn, 'SELECT deprecated_package FROM packages');
             } else {
-                if ($query) {
-                    $this->databaseExists = true;
-                    if (extension_loaded('mysqli')) {
-                        $query = @mysqli_query($conn, 'SELECT rest_support FROM channels');
-                    } else {
-                        $query = @mysql_query('SELECT rest_support FROM channels', $conn);
-                    }
-                    if (!$query) {
-                        $a = $this->updateDatabase(
-                            '@data-dir@/Chiara_PEAR_Server/data/restsupport-0.18.0.sql',
-                            'updating database to add REST xml support', $conn);
-                        if (!$a) {
-                            return $a;
-                        }
-                    }
-    
-                    // handles-channel upgrade
-                    if (extension_loaded('mysqli')) {
-                        $query = @mysqli_query($conn, 'SELECT channel FROM handles');
-                    } else {
-                        $query = @mysql_query('SELECT channel FROM handles', $conn);
-                    }
-                    if (!$query) {
-                        $a = $this->updateDatabase(
-                            '@data-dir@/Chiara_PEAR_Server/data/handles-channel-0.18.2.sql',
-                            'updating database to add support for grouping handles by channel', $conn);
-                        if (!$a) {
-                            return $a;
-                        }
-                    }
-    
-                    if (extension_loaded('mysqli')) {
-                        $query = @mysqli_query($conn, 'SELECT channel_deprecated FROM packages');
-                    } else {
-                        $query = @mysql_query('SELECT channel_deprecated FROM packages', $conn);
-                    }
-                    if (!$query) {
-                        $a = $this->updateDatabase(
-                 '@data-dir@/Chiara_PEAR_Server/data/deprecatedpackages-chiara_pear_server-0.17.0.sql',
-                 'updating database to add deprecated package support', $conn);
-                        if (!$a) {
-                            $this->closeDB($conn);
-                            return $a;
-                        }
-                    } else {
-                        $this->_ui->outputData('database is already setup');
-                    }
-                    $this->closeDB($conn);
-                    return $this->checkSetup();
+                $query = @mysql_query('SELECT deprecated_package FROM packages', $conn);
+            }
+            if (!$query) {
+                $a = $this->updateDatabase(
+         '@data-dir@/Chiara_PEAR_Server/data/deprecatedpackages-chiara_pear_server-0.17.0.sql',
+         'updating database to add deprecated package support', $conn);
+                if (!$a) {
+                    return $a;
                 }
             }
+            // handles-channel upgrade
+            if (extension_loaded('mysqli')) {
+                $query = @mysqli_query($conn, 'SELECT channel FROM handles');
+            } else {
+                $query = @mysql_query('SELECT channel FROM handles', $conn);
+            }
+            if (!$query) {
+                $a = $this->updateDatabase(
+                    '@data-dir@/Chiara_PEAR_Server/data/handles-channel-0.18.2.sql',
+                    'updating database to add support for grouping handles by channel', $conn);
+                if (!$a) {
+                    return $a;
+                }
+                $this->fixHandles = true;
+            }
+            $upgraded = false;
+            // channel field size upgrade
+            if (extension_loaded('mysqli')) {
+                $query = @mysqli_query($conn, 'SHOW COLUMNS FROM maintainers');
+                while ($res = mysqli_fetch_array($query, MYSQLI_ASSOC)) {
+                    if ($res['Field'] == 'channel') {
+                        if ($res['Type'] == 'varchar(255)') {
+                            $upgraded = true;
+                        }
+                    }
+                }
+            } else {
+                $query = @mysql_query('SHOW COLUMNS FROM maintainers', $conn);
+                while ($res = mysql_fetch_array($query, MYSQL_ASSOC)) {
+                    if ($res['Field'] == 'channel') {
+                        if ($res['Type'] == 'varchar(255)') {
+                            $upgraded = true;
+                        }
+                    }
+                }
+            }
+            if (!$upgraded) {
+                $a = $this->updateDatabase(
+                    '@data-dir@/Chiara_PEAR_Server/data/maintainers-channel-0.18.4.sql',
+                    'updating database to increase size of channel field', $conn);
+                if (!$a) {
+                    return $a;
+                }
+            }
+            // update the contents of package_extras
+            $upgraded = false;
+            if (extension_loaded('mysqli')) {
+                $query = @mysqli_query($conn, 'SHOW COLUMNS FROM package_extras');
+                while ($res = mysqli_fetch_array($query, MYSQLI_ASSOC)) {
+                    if ($res['Field'] == 'qa_approval') {
+                        $upgraded = true;
+                        break;
+                    }
+                }
+            } else {
+                $query = @mysql_query('SHOW COLUMNS FROM package_extras', $conn);
+                while ($res = mysql_fetch_array($query, MYSQL_ASSOC)) {
+                    if ($res['Field'] == 'qa_approval') {
+                        $upgraded = true;
+                        break;
+                    }
+                }
+            }
+            if (!$upgraded) {
+                $a = $this->updateDatabase(
+                    '@data-dir@/Chiara_PEAR_Server/data/package_extras_missingvalues-0.18.5.sql',
+                    'updating database to add missing fields to package_extras', $conn);
+                if (!$a) {
+                    return $a;
+                }
+            }
+            // update the keys of package_extras
+            $upgraded = true;
+            if (extension_loaded('mysqli')) {
+                $query = @mysqli_query($conn, 'SHOW COLUMNS FROM package_extras');
+                while ($res = mysqli_fetch_array($query, MYSQLI_ASSOC)) {
+                    if ($res['Field'] == 'package') {
+                        if ($res['Null'] == 'YES') {
+                            $upgraded = false;
+                        }
+                        break;
+                    }
+                }
+            } else {
+                $query = @mysql_query('SHOW COLUMNS FROM package_extras', $conn);
+                while ($res = mysql_fetch_array($query, MYSQL_ASSOC)) {
+                    if ($res['Field'] == 'package') {
+                        if ($res['Null'] == 'YES') {
+                            $upgraded = false;
+                        }
+                        break;
+                    }
+                }
+            }
+            if (!$upgraded) {
+                $a = $this->updateDatabase(
+                    '@data-dir@/Chiara_PEAR_Server/data/package_extras_keys-0.18.5.sql',
+                    'updating database to add keys to package_extras', $conn);
+                if (!$a) {
+                    return $a;
+                }
+            }
+            // update the NULL of package_extras new fields
+            $upgraded = true;
+            if (extension_loaded('mysqli')) {
+                $query = @mysqli_query($conn, 'SHOW COLUMNS FROM package_extras');
+                while ($res = mysqli_fetch_array($query, MYSQLI_ASSOC)) {
+                    if ($res['Field'] == 'qa_approval') {
+                        if ($res['Null'] == 'YES') {
+                            $upgraded = false;
+                        }
+                        break;
+                    }
+                }
+            } else {
+                $query = @mysql_query('SHOW COLUMNS FROM package_extras', $conn);
+                while ($res = mysql_fetch_array($query, MYSQL_ASSOC)) {
+                    if ($res['Field'] == 'qa_approval') {
+                        if ($res['Null'] == 'YES') {
+                            $upgraded = false;
+                        }
+                        break;
+                    }
+                }
+            }
+            if (!$upgraded) {
+                $a = $this->updateDatabase(
+                    '@data-dir@/Chiara_PEAR_Server/data/package_extras_fixvalues-0.18.5.sql',
+                    'updating database to make all fields non-null in package_extras', $conn);
+                if (!$a) {
+                    return $a;
+                }
+            }
+            // REST support upgrade
+            if (extension_loaded('mysqli')) {
+                $query = @mysqli_query($conn, 'SELECT rest_support FROM channels');
+            } else {
+                $query = @mysql_query('SELECT rest_support FROM channels', $conn);
+            }
+            if (!$query) {
+                $a = $this->updateDatabase(
+                    '@data-dir@/Chiara_PEAR_Server/data/restsupport-0.18.0.sql',
+                    'updating database to add REST xml support', $conn);
+                if (!$a) {
+                    return $a;
+                }
+            }
+            // Categories support upgrade
+            if (extension_loaded('mysqli')) {
+                $check = @mysqli_query($conn, 'SELECT * FROM categories');
+            } else {
+                $check = @mysql_query('SELECT * FROM categories', $conn);
+            }
+            if ($check) {
+                $this->_ui->outputData('database is already upgraded');
+                $this->closeDB($conn);
+                return $this->checkSetup(); // tables already updated
+            }
+            if (extension_loaded('mysqli')) {
+                $query = mysqli_select_db($conn, $answers['database']);
+            } else {
+                $query = mysql_select_db($answers['database'], $conn);
+            }
+            if ($query) {
+                $a = $this->updateDatabase(
+                    '@data-dir@/Chiara_PEAR_Server/data/upgrade-0.12.0_0.13.0.sql', false, $conn);
+                if (!$a) {
+                    $this->closeDB($conn);
+                    return $a;
+                }
+            }
+            return $this->checkSetup();
         }
         // Check to see if given database already exists
         // FIXME: This sequence needs to be re-worked in the switch to DB or MDB2 usage
@@ -551,6 +584,7 @@ class Server_mysqlinstall_postinstall
         );
         $dbo = DB_DataObject::factory('handles');
         $dbo->handle = $this->handle;
+        $dbo->channel = $this->channel;
         PEAR::pushErrorHandling(PEAR_ERROR_RETURN);
         if (!$dbo->find()) {
             $this->_ui->outputData('Add the primary administrator');

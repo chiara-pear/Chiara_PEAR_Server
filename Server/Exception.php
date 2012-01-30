@@ -278,4 +278,26 @@ class Chiara_PEAR_Server_ExceptionMaintainerManagesPackages extends Chiara_PEAR_
         parent::__construct($msg ? $msg : $this->_message);
     }
 }
+
+class Chiara_PEAR_Server_CannotOpenRelease extends Chiara_PEAR_Server_Exception
+{
+    protected $_message = 'Uploaded release "%r" cannot be opened';
+
+    public function __construct($release, $msg = false)
+    {
+        $this->_data = array('r' => $release);
+        parent::__construct($msg ? $msg : $this->_message);
+    }
+}
+
+class Chiara_PEAR_Server_CannotSaveRelease extends Chiara_PEAR_Server_Exception
+{
+    protected $_message = 'Uploaded release "%r" cannot be saved';
+
+    public function __construct($release, $msg = false)
+    {
+        $this->_data = array('r' => $release);
+        parent::__construct($msg ? $msg : $this->_message);
+    }
+}
 ?>
