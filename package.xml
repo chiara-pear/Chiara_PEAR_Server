@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" packagerversion="1.7.3" version="2.0" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
+<package xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" packagerversion="1.8.0alpha1" version="2.0" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
  <name>Chiara_PEAR_Server</name>
  <channel>chiara-local</channel>
  <summary>A lightweight pearweb-compatible channel server for hosting a PEAR channel</summary>
@@ -34,27 +34,24 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
   <email>clay@killersoft.com</email>
   <active>no</active>
  </lead>
- <date>2008-07-08</date>
- <time>13:39:41</time>
+ <date>2008-11-21</date>
+ <time>13:34:59</time>
  <version>
-  <release>0.19.0RC1</release>
+  <release>0.19.0</release>
   <api>0.18.0</api>
  </version>
  <stability>
-  <release>devel</release>
+  <release>beta</release>
   <api>alpha</api>
  </stability>
  <license uri="http://www.php.net/license">PHP License</license>
  <notes>PLEASE BACKUP YOUR EXISTING CHANNEL BEFORE UPDATING!
 
-Feature/Bugfix Release
-Bug #43  	 Edit maintainer doesn't save admin value. [bbieber]
-Bug #27  	 use MDB2_Schema for managing the database in post-install script [bbieber]
-Bug #31  	 Stock install fails : Table 'pear.packages' doesn't exist [bbieber] 
-
-Features:
-* Admins can now set passwords for other users. [cweiske]
-* Add new packages and maintainers on upload. [cweiske]</notes>
+Bugfix Release:
+Bug #47 post-installation script failed [cweiske|bbieber]
+* Database was not created on install [cweiske]
+* Key length was too long in some instances [cweiske]
+* Maintainers cannot be assigned to new packages [bbieber]</notes>
  <contents>
   <dir baseinstalldir="Chiara/PEAR" name="/">
    <file baseinstalldir="Chiara/PEAR" md5sum="7b436050733a8395390e7d8d85380694" name="data/DBDataObject/pearserver.ini" role="data"/>
@@ -84,16 +81,16 @@ Features:
    </file>
    <file baseinstalldir="Chiara/PEAR" md5sum="f74fb0ccb33d4bf9be27a0ae143dda66" name="Server/docs/examples/index.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="dd36b07e1b5914f377078ad5b395337b" name="Server/Frontend/Savant3/login.tpl.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="750e7f240183779643d2c6bba6ec501e" name="Server/Frontend/HTMLQuickForm.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="5afd262924446045027524b733e3168b" name="Server/Frontend/HTMLQuickForm.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="57d1a21b471f0894847d99fb4b6732e6" name="Server/Frontend/Savant3.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="d10cccb8d247387cf1d9284b33cc3da0" name="Server/Backend.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="09a8b56ea096454e3401f00e5f3ae8ec" name="Server/Exception.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="05a48280d79f3696dc3c1854463e5a7e" name="Server/Frontend.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="080bf222eae4379d3efce0fad9c3104f" name="Server/Frontend.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="19712c0fdcda630eb90e3e281d54673f" name="Server/Maintainer.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="2d999d52bd0b8f2e8591bf887a11ffea" name="Server/Package.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="d77e527ccdc015bfaf1fcdf61b730646" name="Server/Release.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="aa094de16b9ef2a3bf563d8ad2a74517" name="Server/REST.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="27a050a1838657264f7d4194a7100c23" name="Chiara_PEAR_Server_Database.php" role="php">
+   <file baseinstalldir="Chiara/PEAR" md5sum="dbd4e4066d5d5607471648f249268d47" name="Chiara_PEAR_Server_Database.php" role="php">
     <tasks:replace from="@php-dir@" to="php_dir" type="pear-config"/>
     <tasks:replace from="@data-dir@" to="data_dir" type="pear-config"/>
     <tasks:postinstallscript>
@@ -219,9 +216,8 @@ Features:
      </tasks:paramgroup>
     </tasks:postinstallscript>
    </file>
-   <file baseinstalldir="Chiara/PEAR" md5sum="1acd48da944783f8cc8892d2a0009c38" name="database-0.18.7.xml" role="data"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="1acd48da944783f8cc8892d2a0009c38" name="database.xml" role="data"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="9f8a0993c106243363c83934474859fc" name="db_setup_test.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="bd1a9ba06453f59cc1c41f3230d083c3" name="database-0.18.7.xml" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="bd1a9ba06453f59cc1c41f3230d083c3" name="database.xml" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="c2ec9449a452eb08ce17e00d402e4a88" name="Server.php" role="php"/>
   </dir>
  </contents>
@@ -675,26 +671,6 @@ fix invalid release exception error message</notes>
   </release>
   <release>
    <version>
-    <release>0.19.0</release>
-    <api>0.18.0</api>
-   </version>
-   <stability>
-    <release>alpha</release>
-    <api>alpha</api>
-   </stability>
-   <date>2008-06-26</date>
-   <license uri="http://www.php.net/license">PHP License</license>
-   <notes>Feature/Bugfix Release
-Bug #43  	 Edit maintainer doesn&amp;#180;t save admin value. [bbieber]
-Bug #27  	 use MDB2_Schema for managing the database in post-install script [bbieber]
-Bug #31  	 Stock install fails : Table 'pear.packages' doesn't exist [bbieber] 
-
-Features:
-* Admins can now set passwords for other users. [cweiske]
-* Add new packages and maintainers on upload. [cweiske]</notes>
-  </release>
-  <release>
-   <version>
     <release>0.19.0RC1</release>
     <api>0.18.0</api>
    </version>
@@ -714,6 +690,25 @@ Bug #31  	 Stock install fails : Table 'pear.packages' doesn't exist [bbieber]
 Features:
 * Admins can now set passwords for other users. [cweiske]
 * Add new packages and maintainers on upload. [cweiske]</notes>
+  </release>
+  <release>
+   <version>
+    <release>0.19.0</release>
+    <api>0.18.0</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>alpha</api>
+   </stability>
+   <date>2008-11-21</date>
+   <license uri="http://www.php.net/license">PHP License</license>
+   <notes>PLEASE BACKUP YOUR EXISTING CHANNEL BEFORE UPDATING!
+
+Bugfix Release:
+Bug #47 post-installation script failed [cweiske|bbieber]
+* Database was not created on install [cweiske]
+* Key length was too long in some instances [cweiske]
+* Maintainers cannot be assigned to new packages [bbieber]</notes>
   </release>
  </changelog>
 </package>

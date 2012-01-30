@@ -3,6 +3,12 @@ abstract class Chiara_PEAR_Server_Frontend
 {
     protected $_server;
     protected $_channel;
+    
+    /**
+     * Backend
+     *
+     * @var Chiara_PEAR_Server_Backend
+     */
     protected $_backend;
 
     public function __construct($channel)

@@ -24,7 +24,7 @@
    <field>
     <name>channel</name>
     <type>text</type>
-    <length>255</length>
+    <length>200</length>
     <notnull>true</notnull>
     <default></default>
    </field>
@@ -79,7 +79,7 @@
    <field>
     <name>channel</name>
     <type>text</type>
-    <length>255</length>
+    <length>200</length>
     <notnull>true</notnull>
     <default></default>
    </field>
@@ -146,7 +146,7 @@
    <field>
     <name>channel</name>
     <type>text</type>
-    <length>255</length>
+    <length>200</length>
     <notnull>true</notnull>
     <default></default>
    </field>
@@ -244,7 +244,7 @@
    <field>
     <name>channel</name>
     <type>text</type>
-    <length>255</length>
+    <length>200</length>
     <notnull>true</notnull>
     <default></default>
    </field>
@@ -303,7 +303,7 @@
    <field>
     <name>channel</name>
     <type>text</type>
-    <length>255</length>
+    <length>200</length>
     <notnull>true</notnull>
     <default></default>
    </field>
@@ -380,7 +380,7 @@
    <field>
     <name>channel</name>
     <type>text</type>
-    <length>255</length>
+    <length>200</length>
     <notnull>true</notnull>
     <default></default>
    </field>
@@ -448,7 +448,7 @@
    <field>
     <name>deprecated_channel</name>
     <type>text</type>
-    <length>255</length>
+    <length>200</length>
     <notnull>true</notnull>
     <default></default>
    </field>
@@ -489,7 +489,7 @@
    <field>
     <name>channel</name>
     <type>text</type>
-    <length>255</length>
+    <length>200</length>
     <notnull>true</notnull>
     <default></default>
    </field>

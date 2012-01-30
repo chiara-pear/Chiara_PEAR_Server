@@ -503,7 +503,9 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
     	$table = new HTML_Table();
         $table->addRow(array('Package Name','Maintainers'),array(),'TH');
         foreach ($this->_backend->listPackages(false, false, false) as $package) {
-            if (!$this->_backend->packageLead($package['package'], $this->_user)) {
+        $maintainers = $this->_backend->listPackageMaintainers($package['package']);
+            if (count($maintainers)
+                && !$this->_backend->packageLead($package['package'], $this->_user)) {
                 continue;
             }
             $table->addRow(array('<a href="' . $this->_index . '?f=' . $this->_server->getMethodIndex('managePackage') . '&amp;managepackage=' . $package['package'] . '">' . $package['package'] . '</a>',

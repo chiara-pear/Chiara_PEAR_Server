@@ -37,6 +37,7 @@ class Chiara_PEAR_Server_Database_postinstall
         $this->_pkg = &$pkg;
         $this->lastversion = $lastversion;
         $this->databaseExists = false;
+
         if (!$this->validPreviousVersion()) {
             $this->outputData('Your last version was '.$this->lastversion.'.
 Database upgrades cannot be performed on versions less than 0.18.7.
@@ -101,7 +102,6 @@ and run the post install script, then pear up chiara/Chiara_PEAR_Server.');
                 return true;
             break;
             case 'databaseSetup' :
-                $this->checkSetup($answers);
                 return $this->createDatabase($answers);
             break;
             case 'channelCreate' :
@@ -154,7 +154,18 @@ and run the post install script, then pear up chiara/Chiara_PEAR_Server.');
         }
     }
     
-    function getDBConnection($answers)
+    /**
+    * Creates the database connection using MDB2 and returns it.
+    *
+    * @param array   $answers  Array of database connection options like
+    *                          dbtype, dbhost, database, user, password,
+    *                          name and handle.
+    * @param boolean $database If the database shall be selected
+    *
+    * @return mixed MDB2 connection object or boolean false if something went
+    *               wrong
+    */
+    function getDBConnection($answers, $database = true)
     {
         $this->dbtype     = $answers['dbtype'];
         $this->dbhost     = $answers['dbhost'];
@@ -163,10 +174,15 @@ and run the post install script, then pear up chiara/Chiara_PEAR_Server.');
         $this->password   = $answers['password'];
         $this->channel    = $answers['name'];
         $this->handle     = $answers['handle'];
-        $this->dsn        = $answers['dbtype'].'://'.$answers['user'].':'.$answers['password'].'@'.$answers['dbhost'].'/'.$answers['database'];
+        $this->dsn        = $answers['dbtype'].'://'.$answers['user'].':'.$answers['password'].'@'.$answers['dbhost'].'/';
+        if ($database) {
+            $this->dsn .= $answers['database'];
+        }
+
+        PEAR::setErrorHandling(PEAR_ERROR_RETURN);
         $mdb2 =& MDB2::connect($this->dsn);
         if (PEAR::isError($mdb2)) {
-            $this->outputData('Connection to database failed:'.$mdb2->getMessage());
+            $this->outputData('Connection to database failed: ' . $mdb2->getMessage());
             return false;
         } else {
             return $mdb2;
@@ -202,9 +218,7 @@ and run the post install script, then pear up chiara/Chiara_PEAR_Server.');
         $this->outputData('Preparing table operations...');
         
         $db = $this->getDBConnection($answers);
-        
-        if (PEAR::isError($db)) {
-            $this->outputData('Could not create database connection. "'.$db->getMessage().'"');
+        if (!$db) {
             $this->noDBsetup = true;
             return false;
         }
@@ -272,20 +286,25 @@ and run the post install script, then pear up chiara/Chiara_PEAR_Server.');
     
     function createDatabase($answers)
     {
-        
-        $db = $this->getDBConnection($answers);
-        
-        if (PEAR::isError($db)) {
-            $this->outputData('Could not create database connection. "'.$db->getMessage().'"');
+        $db = $this->getDBConnection($answers, false);
+        if (!$db) {
             $this->noDBsetup = true;
             return false;
         }
         $this->outputData('Checking for existing database. . .');
-        $sql = 'CREATE DATABASE IF NOT EXISTS '.$answers['database'];
+        $this->outputData(
+            'Your database user will need global CREATE privileges and' . "\n"
+            . 'CREATE, ALTER and INDEX privileges on the new database.'
+        );
+
+        $sql    = 'CREATE DATABASE IF NOT EXISTS ' . $answers['database'];
         $result = $db->exec($sql);
         
         if (PEAR::isError($result)) {
-            $this->outputData('Could not create database. "'.$result->getMessage().'" '.$result->getUserInfo().' '.$result->getDebugInfo());
+            $this->outputData('Could not create database:');
+            $this->outputData('Message: ' . $result->getMessage());
+            $this->outputData('User info: ' . $result->getUserInfo());
+            $this->outputData('Debug info: ' . $result->getDebugInfo());
             $this->noDBsetup = true;
             return false;
         }
