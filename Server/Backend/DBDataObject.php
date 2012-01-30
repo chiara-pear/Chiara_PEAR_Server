@@ -3,7 +3,7 @@ require_once 'DB/DataObject.php';
 require_once 'Chiara/PEAR/Server/Backend.php';
 require_once 'Chiara/PEAR/Server/Exception.php';
 /**
- * @version $Id: DBDataObject.php,v 1.51 2005/11/12 17:45:39 cellog Exp $
+ * @version $Id: DBDataObject.php 256 2006-08-20 02:18:24Z cellog $
  * @author Greg Beaver <cellog@php.net>
  */
 class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
@@ -103,8 +103,23 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
             return false;
         }
         $ret = ($releases->delete() !== false);
+        $package = DB_DataObject::factory('packages');
+        $package->channel = $this->_channel;
+        $package->package = $packagename;
+        $package->find(true);
+        if (!$package->category_id) {
+            $category = 'Default';
+        } else {
+            $cat = DB_DataObject::factory('categories');
+            $cat->id = $package->category_id;
+            $cat->channel = $this->_channel;
+            $cat->find(true);
+            $category = $cat->name;
+        }
         if ($ret) {
             $this->deleteReleaseREST($packagename, $version);
+            clearstatcache();
+            $this->savePackagesCategoryREST($category);
         }
         return $ret;
     }
@@ -117,7 +132,7 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
         $package = DB_DataObject::factory('packages');
         $package->channel = $this->_channel;
         $package->package = $release->getPackage();
-        if (!$package->find()) {
+        if (!$package->find(true)) {
             return false;
         }
         $maintainers = DB_DataObject::factory('maintainers');
@@ -129,46 +144,58 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
         }
         unset($maintainers->handle); // retrieve all maintainers
         $maintainers->find();
-        $test = array();
+        $existing_maintainers = array();
         while ($maintainers->fetch()) {
             if ($maintainers->handle == $release->getReleasingMaintainer() && $maintainers->role != 'lead') {
                 throw new Chiara_PEAR_Server_ExceptionMaintainerNotLead($maintainers->handle, $package->package, $this->_channel);
             }
-            $test[$maintainers->handle] = $maintainers->toArray();
+            $existing_maintainers[$maintainers->handle] = $maintainers->toArray();
         }
         foreach ($release->getMaintainers() as $maintainer) {
             // add or update all active maintainers
+            $maintainers = DB_DataObject::factory('maintainers');
             $maintainers->handle = $maintainer['handle'];
-            $maintainers->name = $maintainer['name'];
-            $maintainers->email = $maintainer['email'];
-            $maintainers->active = 1;
-            if (isset($test[$maintainer['handle']])) {
-                $existrole = $test[$maintainer['handle']]['role'];
-                unset($test[$maintainer['handle']]);
+            $maintainers->package = $package->package;
+            $maintainers->channel = $this->_channel;
+            if (isset($existing_maintainers[$maintainer['handle']])
+                    && $maintainers->find()) {
+                // Maintainer exists already, update details.
+                $maintainers->fetch();
+                $existrole = $existing_maintainers[$maintainer['handle']]['role'];
+                unset($existing_maintainers[$maintainer['handle']]);
                 if ($existrole != 'lead') {
                     // do not allow demotion through a release, only through web frontend
                     $maintainers->role = $maintainer['role'];
                 }
+                $maintainers->active = 1;
                 $maintainers->update();
             } else {
+                // Maintainer does not exist yet.
                 $handles = DB_DataObject::factory('handles');
                 $handles->handle = $maintainer['handle'];
                 if (!$handles->find()) {
                     throw new Chiara_PEAR_Server_ExceptionMaintainerDoesntExist(
                         $maintainer['handle']);
                 }
+                $maintainers->active = 1;
                 $maintainers->role = $maintainer['role'];
                 $maintainers->insert();
             }
         }
-        foreach ($test as $maintainer) {
-            // mark all maintainers removed from a package.xml as inactive
+        /* 
+         * Now remove any maintainers that were existing before, but not present in this release.
+         * This means the maintainers were removed from package.xml, so mark them as inactive.
+         */
+        foreach ($existing_maintainers as $maintainer) {
+            $maintainers = DB_DataObject::factory('maintainers');
             $maintainers->handle = $maintainer['handle'];
-            $maintainers->name = $maintainer['name'];
-            $maintainers->email = $maintainer['email'];
-            $maintainers->active = 0;
-            $maintainers->role = $maintainer['role'];
-            $maintainers->update();
+            $maintainers->package = $package->package;
+            $maintainers->channel = $this->_channel;
+            if ($maintainers->find() && $maintainers->fetch()) {
+                $maintainers->active = 0;
+                $maintainers->role = $maintainer['role'];
+                $maintainers->update();
+            }
         }
         $releasedata = DB_DataObject::factory('releases');
         $releasedata->channel = $this->_channel;
@@ -185,6 +212,15 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
         $releasedata->deps = serialize($release->getDeps(false));
         $releasedata->packagexml = $release->getXml();
         $ret = $releasedata->insert();
+        if (!$package->category_id) {
+            $category = 'Default';
+        } else {
+            $cat = DB_DataObject::factory('categories');
+            $cat->id = $package->category_id;
+            $cat->channel = $this->_channel;
+            $cat->find(true);
+            $category = $cat->name;
+        }
         if ($ret) {
             $this->savePackageDepsREST($releasedata->package, $releasedata->version,
                 $release->getDependencies());
@@ -192,6 +228,7 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
             $this->savePackageMaintainersREST($releasedata->package);
             $this->saveReleaseREST($releasedata->package, $releasedata->version);
             $this->saveAllReleasesREST($releasedata->package);
+            $this->savePackagesCategoryREST($category);
         }
         return $ret;
     }
@@ -397,7 +434,8 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
         $category->name = $cat->name;
         $id = $category->id;
         unset($category->id);
-        if (!$category->find(true)) {
+        $category_check = $category->find(true);
+        if (0 === $category_check || $id === $category->id) {
             $category->id = $id;
             $category->description = $cat->description;
             $category->alias = $cat->alias;
@@ -501,6 +539,7 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
         }
         $package->category_id = $pkg->category_id;
         $package->license = $pkg->license;
+        $package->licenseuri = $pkg->license_uri;
         $package->description = $pkg->description;
         $package->summary = $pkg->summary;
 
@@ -588,6 +627,7 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
         $package->channel = $this->_channel;
         $package->category_id = $p->category_id;
         $package->license = $p->license;
+        $package->license_uri = $p->licenseuri;
         $package->description = $p->description;
         $package->summary = $p->summary;
         $package->parent = $p->parent;
@@ -719,6 +759,7 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
         if (!$handle->find()) {
             throw new Chiara_PEAR_Server_ExceptionMaintainerDoesntExist($handle->handle);
         }
+        $handle->fetch();
         $handle->email = $maintainer->email;
         $handle->name = $maintainer->name;
         $handle->uri = $maintainer->uri;

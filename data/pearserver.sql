@@ -1,6 +1,6 @@
 # Database : pearserver
 # --------------------------------------------------------
-# $Id: pearserver.sql,v 1.13 2006/04/09 22:06:38 cellog Exp $
+# $Id: pearserver.sql 252 2006-06-26 15:39:41Z bbieber $
 # --------------------------------------------------------
 
 #
@@ -38,7 +38,7 @@ CREATE TABLE channels (
   rest_support int(6) NOT NULL default '0',
   validatepackage varchar(255) default NULL,
   validatepackageversion varchar(25) default NULL,
-  PRIMARY KEY  (channel)
+  PRIMARY KEY  (channel(100))
 );
 # --------------------------------------------------------
 
@@ -56,7 +56,7 @@ CREATE TABLE handles (
   wishlist text,
   `password` varchar(50) NOT NULL default '',
   admin int(11) NOT NULL default '0',
-  PRIMARY KEY  (channel,handle)
+  PRIMARY KEY  (channel(100),handle)
 );
 # --------------------------------------------------------
 
@@ -70,7 +70,7 @@ CREATE TABLE maintainers (
   package varchar(80) NOT NULL default '',
   role varchar(30) NOT NULL default 'lead',
   active tinyint(4) NOT NULL default '1',
-  PRIMARY KEY  (handle,channel,package)
+  PRIMARY KEY  (handle,channel(100),package)
 );
 # --------------------------------------------------------
 
@@ -86,7 +86,7 @@ CREATE TABLE package_extras (
   docs_uri varchar(255) NOT NULL default '',
   qa_approval int(1) NOT NULL default 0,
   unit_tested int(1) NOT NULL default 0,
-  PRIMARY KEY (channel, package)
+  PRIMARY KEY (channel(100), package)
 );
 # --------------------------------------------------------
 
@@ -105,7 +105,7 @@ CREATE TABLE packages (
   parent varchar(80) default NULL,
   deprecated_package varchar(80) NOT NULL default '',
   deprecated_channel varchar(255) NOT NULL default '',
-  PRIMARY KEY  (channel,package)
+  PRIMARY KEY  (channel(100),package)
 );
 # --------------------------------------------------------
 
@@ -129,8 +129,8 @@ CREATE TABLE releases (
   packagexml longtext NOT NULL,
   deps text NOT NULL,
   PRIMARY KEY  (id),
-  UNIQUE KEY version (channel,package,version),
-  KEY channel (channel,package)
+  UNIQUE KEY version (channel(100),package,version),
+  KEY channel (channel(100),package)
 );
 # --------------------------------------------------------
 

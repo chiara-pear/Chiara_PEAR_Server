@@ -108,6 +108,16 @@ class Chiara_PEAR_Server_REST
         $rdir = $this->_restdir . DIRECTORY_SEPARATOR . 'r';
         $releases = $this->_backend->listReleases($package);
         if (!$releases) {
+            @unlink($rdir . DIRECTORY_SEPARATOR . strtolower($package) .
+                DIRECTORY_SEPARATOR . 'allreleases.xml');
+            @unlink($rdir . DIRECTORY_SEPARATOR . strtolower($package) .
+                DIRECTORY_SEPARATOR . 'latest.txt');
+            @unlink($rdir . DIRECTORY_SEPARATOR . strtolower($package) .
+                DIRECTORY_SEPARATOR . 'stable.txt');
+            @unlink($rdir . DIRECTORY_SEPARATOR . strtolower($package) .
+                DIRECTORY_SEPARATOR . 'beta.txt');
+            @unlink($rdir . DIRECTORY_SEPARATOR . strtolower($package) .
+                DIRECTORY_SEPARATOR . 'alpha.txt');
             return;
         }
         $info = $this->_getAllReleasesRESTProlog($package);
@@ -150,7 +160,7 @@ class Chiara_PEAR_Server_REST
                 $stable = $release['version'];
             }
             if ($release['state'] == 'beta' && !isset($beta)) {
-                $beta = $releasedata['version'];
+                $beta = $release['version'];
             }
             if ($release['state'] == 'alpha' && !isset($alpha)) {
                 $alpha = $release['version'];
@@ -378,18 +388,27 @@ class Chiara_PEAR_Server_REST
                         'allreleases.xml'));
                 $dirhandle = opendir($rdir . DIRECTORY_SEPARATOR .
                     strtolower($package['package']));
+                $depinfo = array();
                 while (false !== ($entry = readdir($dirhandle))) {
                     if (strpos($entry, 'deps.') === 0) {
-                        $version = str_replace(array('deps.', '.txt'), array('', ''), $entry);
+                        $version = str_replace(array('deps.', '.txt'),
+                                               array('', ''), $entry);
+                        $dep = htmlspecialchars(utf8_encode(file_get_contents($rdir .
+                            DIRECTORY_SEPARATOR .
+                            strtolower($package['package']) . DIRECTORY_SEPARATOR .
+                            $entry)));
+                        $depinfo[$version] = $dep;
+                    }
+                }
+                uksort($depinfo, create_function('$a,$b',
+                    'return - version_compare($a, $b);'));
+                foreach ($depinfo as $version => $dep) {
                         $fullpackageinfo .= '
 <deps>
  <v>' . $version . '</v>
- <d>' . htmlspecialchars(utf8_encode(file_get_contents($rdir . DIRECTORY_SEPARATOR .
-                        strtolower($package['package']) . DIRECTORY_SEPARATOR .
-                        $entry))) . '</d>
+ <d>' . $dep . '</d>
 </deps>
 ';
-                    }
                 }
             }
             $fullpackageinfo .= '</pi>
@@ -453,10 +472,10 @@ class Chiara_PEAR_Server_REST
     }
 
     /**
-     * @param string
+     * @param string $package name of the package
      * @param string
      */
-    public function deleteReleaseREST($packagename, $version)
+    public function deleteReleaseREST($package, $version)
     {
         $rdir = $this->_restdir . DIRECTORY_SEPARATOR . 'r';
         if (!file_exists($rdir . DIRECTORY_SEPARATOR . strtolower($package))) {

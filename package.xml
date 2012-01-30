@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" packagerversion="1.5.0a1" version="2.0" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
+<package xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" packagerversion="1.4.11" version="2.0" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
  <name>Chiara_PEAR_Server</name>
  <channel>chiara-local</channel>
  <summary>A lightweight pearweb-compatible channel server for hosting a PEAR channel</summary>
@@ -28,10 +28,10 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
   <email>clay@killersoft.com</email>
   <active>yes</active>
  </lead>
- <date>2006-04-09</date>
- <time>22:43:11</time>
+ <date>2006-08-19</date>
+ <time>22:19:10</time>
  <version>
-  <release>0.18.6</release>
+  <release>0.18.7</release>
   <api>0.18.0</api>
  </version>
  <stability>
@@ -39,21 +39,32 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
   <api>alpha</api>
  </stability>
  <license uri="http://www.php.net/license">PHP License</license>
- <notes>* security fix: if a site has 2 channels, it was possible for
-  a user to log into the other channel with the same username without
-  verification</notes>
+ <notes>Bugfix release
+ * fix Bug #3: REST.php variable name mismatch (Brett Bieber),
+ * fix Bug #11: Category update doesn't update category details (Marek Kuziel),
+ * fix Bug #30: needed extensions not listed in package.xml (Brett Bieber),
+ * fix Bug #19: warnings on delete of a release (Brett Bieber),
+ * fix Bug #34: License URI gets lost when creating a package (Brett Bieber),
+ * fix Bug #33: FIX for mysql ERROR 1071 (42000) (Brett Bieber),
+ * fix Bug #20: upload release of Chiara_Bugs resets leads (Brett Bieber),
+ * fix Bug #29: Unable to open 'My Account' (Brett Bieber),
+ * fix Bug #35: massive Packages Category REST is *not* saved on release (Greg Beaver)
+ * fix Bug #36: deps are sorted in reverse order in packagesinfo.xml (Greg Beaver)
+ * fix Bug #37: packagesinfo.xml is not generated on release delete either (Greg Beaver)
+ * fix Bug #38: if there are no releases, allreleases.xml is not updated to show this (Greg Beaver),
+ * fix Bug #39: multiple channels elicits notices on login page (Greg Beaver).</notes>
  <contents>
   <dir baseinstalldir="Chiara/PEAR" name="/">
    <file baseinstalldir="Chiara/PEAR" md5sum="25731be0a687a8b1c13311953d02495d" name="data/DBDataObject/pearserver.ini" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="9245dd65f9a98d7e372736b5f7f428a9" name="data/deprecatedpackages-chiara_pear_server-0.17.0.sql" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="854d541ec870d5b0f9a2860a08972849" name="data/handles-channel-0.18.2.sql" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="d191a3016b4af8825c5e4a6b76854fb7" name="data/maintainer-0.19.0.sql" role="data"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="b074733015dd02b1d36cc67694206e26" name="data/maintainers-channel-0.18.4.sql" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="2bd3b4af7eec28c57fb27c76666a24f8" name="data/maintainers-channel-0.18.4.sql" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="c082d3730bef05db9d0710945a6c03fd" name="data/package_extras-0.19.0.sql" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="fbdba6061dc6306c4ab6ba6abd12fe64" name="data/package_extras_fixvalues-0.18.5.sql" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="7e6a2d0b26f6d58eeaeff2503e551b9c" name="data/package_extras_keys-0.18.5.sql" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="880601a28c6cc98a38a363554ff24e3d" name="data/package_extras_missingvalues-0.18.5.sql" role="data"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="79f9b2ccf7586c0f172e302c3848ff30" name="data/pearserver.sql" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="e1876205b4efa800c0c7477d3372448f" name="data/pearserver.sql" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="73cf7006a8e0825da5ab6bfb7794f1fa" name="data/pear_server.css" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="c8727151021b67366e1abe2b2cc3f8f9" name="data/restsupport-0.18.0.sql" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="07ba3a53b03a622fb560e3cdbc30093a" name="data/upgrade-0.12.0_0.13.0.sql" role="data"/>
@@ -65,16 +76,18 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
    <file baseinstalldir="Chiara/PEAR" md5sum="06d90ce23030bb8035bfd2d9971042d9" name="Server/Backend/DBDataObject/Packages.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="fdbd3dbc58cf9f332d0512a590fbb125" name="Server/Backend/DBDataObject/Package_extras.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="041e1eeef782fa9000772f3bece2775a" name="Server/Backend/DBDataObject/Releases.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="488e52dc1d69309bf4c0fadc43313859" name="Server/Backend/DBDataObject.php" role="php">
+   <file baseinstalldir="Chiara/PEAR" md5sum="6b6165c4013727c1f875ecdda4bae2fc" name="Server/Backend/DBDataObject.php" role="php">
     <tasks:replace from="@php-dir@" to="php_dir" type="pear-config"/>
     <tasks:replace from="@data-dir@" to="data_dir" type="pear-config"/>
    </file>
-   <file baseinstalldir="Chiara/PEAR" md5sum="bfb0a0a1739af2ec8f26edab9e557294" name="Server/Frontend/HTMLQuickForm.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="2539306da4eb4d903faaaa64c13dcca9" name="Server/Frontend/Savant3/login.tpl.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="f2d83a84b8b62eb4242a4112e76bb865" name="Server/Frontend/HTMLQuickForm.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="4f3b86384c2d3cbd61ccd1fef8407d66" name="Server/Frontend/Savant3.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="bfd4a2c606e4bf8e8d9dedcc308f5bca" name="Server/Backend.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="780235e3880066986a30fdeea8f52d9c" name="Server/Exception.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="8911ad27bd432675917864a63b59fc41" name="Server/Exception.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="e7c92c79ed7d708a2e67b66dbdb62daf" name="Server/Frontend.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="dc6ac839a9504dab4dee976cbd349069" name="Server/Maintainer.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="af8efd8cefb0b3cb5631da677a2e156e" name="Server/mysqlinstall.php" role="php">
+   <file baseinstalldir="Chiara/PEAR" md5sum="89d189f9d69c71cb89b463fbe2242873" name="Server/mysqlinstall.php" role="php">
     <tasks:replace from="@php-dir@" to="php_dir" type="pear-config"/>
     <tasks:replace from="@data-dir@" to="data_dir" type="pear-config"/>
     <tasks:postinstallscript>
@@ -193,9 +206,10 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
     </tasks:postinstallscript>
    </file>
    <file baseinstalldir="Chiara/PEAR" md5sum="d2f5bf50575065424870baaee1bdd196" name="Server/Package.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="e4a3657148aa14396ae95691ba0a688f" name="Server/Release.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="280f707a6c45441b073c325d5addf5e1" name="Server/REST.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="6559ce25729b8f73bcf6e9770ba0508a" name="Server.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="08b62c980b5c2b230a19ddbc69f6a190" name="Server/Release.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="c03477cb1e9a782c3615abff54a68b4c" name="Server/REST.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="64dab43dc0edd0e3eb8e0bdc90dfef2b" name=".cvsignore" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="758c5194cc64e2133307ff357c06ffaf" name="Server.php" role="php"/>
   </dir>
  </contents>
  <dependencies>
@@ -216,7 +230,30 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
     <channel>pear.php.net</channel>
     <min>3.2.2</min>
    </package>
+   <extension>
+    <name>zlib</name>
+   </extension>
+   <extension>
+    <name>pcre</name>
+   </extension>
+   <extension>
+    <name>xml</name>
+   </extension>
+   <extension>
+    <name>tokenizer</name>
+   </extension>
+   <extension>
+    <name>session</name>
+   </extension>
   </required>
+  <optional>
+   <extension>
+    <name>mysql</name>
+   </extension>
+   <extension>
+    <name>mysqli</name>
+   </extension>
+  </optional>
   <group hint="Public frontend for users to browse channel packages" name="pearweb">
    <package>
     <name>Crtx_PEAR_Channel_Frontend</name>
@@ -581,6 +618,32 @@ fix invalid release exception error message</notes>
    <notes>* security fix: if a site has 2 channels, it was possible for
   a user to log into the other channel with the same username without
   verification</notes>
+  </release>
+  <release>
+   <version>
+    <release>0.18.7</release>
+    <api>0.18.0</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2006-08-19</date>
+   <license uri="http://www.php.net/license">PHP License</license>
+   <notes>Bugfix release
+ * fix Bug #3: REST.php variable name mismatch (Brett Bieber),
+ * fix Bug #11: Category update doesn't update category details (Marek Kuziel),
+ * fix Bug #30: needed extensions not listed in package.xml (Brett Bieber),
+ * fix Bug #19: warnings on delete of a release (Brett Bieber),
+ * fix Bug #34: License URI gets lost when creating a package (Brett Bieber),
+ * fix Bug #33: FIX for mysql ERROR 1071 (42000) (Brett Bieber),
+ * fix Bug #20: upload release of Chiara_Bugs resets leads (Brett Bieber),
+ * fix Bug #29: Unable to open 'My Account' (Brett Bieber),
+ * fix Bug #35: massive Packages Category REST is *not* saved on release (Greg Beaver)
+ * fix Bug #36: deps are sorted in reverse order in packagesinfo.xml (Greg Beaver)
+ * fix Bug #37: packagesinfo.xml is not generated on release delete either (Greg Beaver)
+ * fix Bug #38: if there are no releases, allreleases.xml is not updated to show this (Greg Beaver),
+ * fix Bug #39: multiple channels elicits notices on login page (Greg Beaver).</notes>
   </release>
  </changelog>
 </package>

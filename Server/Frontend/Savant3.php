@@ -1,21 +1,26 @@
 <?php
 require_once 'Chiara/PEAR/Server/Frontend.php';
-require_once 'HTML/QuickForm.php';
-class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Frontend
+require_once 'Savant3.php';
+class Chiara_PEAR_Server_Frontend_Savant3 extends Chiara_PEAR_Server_Frontend
 {
 
     /**
      * @var HTML_QuickForm
      */
-    protected $_quickForm;
+    protected $_savant;
     protected $_index;
     protected $_tmpdir;
     protected $_user = false;
     protected $_admin = false;
-    public function __construct($channel, $qf, $index, $dir)
+    public function __construct($channel, $index, $dir)
     {
         parent::__construct($channel);
-        $this->_quickForm = $qf;
+        $this->_savant = new Savant3(
+            array(
+                'template_path' => dirname(__FILE__) . '/Savant3',
+                'autoload' => false,
+                'extract' => false,
+            ));
         $this->_index = $index;
         $this->_tmpdir = $dir;
     }
@@ -23,23 +28,15 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
     public function sessionStart()
     {
         session_start();
-        if (session_is_registered('_currentUser') &&
-              is_array($_SESSION['_currentUser']) &&
-              isset($_SESSION['_currentUser'][$this->_channel])) {
+        if (session_is_registered('_currentUser')) {
             $this->_user = $_SESSION['_currentUser'][$this->_channel];
             $this->_admin = $_SESSION['_currentUserAdmin'][$this->_channel];
         } else {
             $this->_user = false;
             $this->_admin = false;
-            @session_register('_currentUser');
-            @session_register('_currentUserAdmin');
-            if (!is_array($_SESSION['_currentUser'])) {
-                $_SESSION['currentUser'] = array();
-            }
+            session_register('_currentUser');
+            session_register('_currentUserAdmin');
             $_SESSION['_currentUser'][$this->_channel] = false;
-            if (!is_array($_SESSION['_currentUserAdmin'])) {
-                $_SESSION['_currentUserAdmin'] = array();
-            }
             $_SESSION['_currentUserAdmin'][$this->_channel] = false;
         }
     }
@@ -73,11 +70,11 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
         if (!$this->_user) {
             return $this->doMainMenu('doLogin', false);
         }
-        $func = $this->_server->getMethod(@$_REQUEST['f']);
-        if ($func !== false) {
+        $func = (string) $_REQUEST['action'];
+        if ($func) {
             $this->parseInput($func);
         } else {
-            if (isset($_REQUEST['f'])) {
+            if (isset($_REQUEST['action'])) {
                 //error
             } else {
                 return $this->doMenu();
@@ -92,10 +89,12 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
                 $this->doMainMenu('doManagePackage', $func, $_REQUEST['managepackage']);
             break;
             case 'managePackageMaintainers' :
-                $this->doMainMenu('doManagePackageMaintainers', $func, $_REQUEST['managepackage']);
+                $this->doMainMenu('doManagePackageMaintainers', $func,
+                    $_REQUEST['managepackage']);
             break;
             case 'manageMaintainer' :
-                $this->doMainMenu('doManageMaintainer', $func, $_REQUEST['managemaintainer']);
+                $this->doMainMenu('doManageMaintainer', $func,
+                    $_REQUEST['managemaintainer']);
             break;
             case 'manageCategory' :
                 $this->doMainMenu('doManageCategory', $func, $_REQUEST['managecategory']);
@@ -112,7 +111,6 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
             case 'deleteRelease' :
                 $this->doMainMenu('doDeleteRelease', $func);
             break;
-            case 'getDownloadURL' :
             case 'addPackage' :
                 $this->doMainMenu('doAddPackage', $func);
             break;
@@ -131,34 +129,48 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
 
     public function doLogin()
     {
-        $this->_quickForm->addElement('header', '', 'Log in');
-        $this->_quickForm->addElement('text', 'user', 'User Name');
-        $this->_quickForm->addElement('password', 'password', 'Password');
-        $this->_quickForm->addElement('submit', 'login', 'Submit');
-        $this->_quickForm->addRule('user', 'Required', 'required');
-        $this->_quickForm->addRule('password', 'Required', 'required');
-        if (isset($_REQUEST['login'])) {
-            if ($this->_quickForm->validate()) {
-                if ($this->_backend->validLogin(
-                trim(strtolower($this->_quickForm->getSubmitValue('user'))),
-                trim($this->_quickForm->getSubmitValue('password')))) {
-                    $_SESSION['_currentUser'][$this->_channel] = trim(strtolower($this->_quickForm->getSubmitValue('user')));
-                    session_write_close();
-                    $this->_user = trim(strtolower($this->_quickForm->getSubmitValue('user')));
-                    if ($this->_backend->isAdmin($this->_user)) {
-                        $this->_admin = true;
-                    } else {
-                        $this->_admin = false;
-                    }
-                    $_SESSION['_currentUserAdmin'][$this->_channel] = $this->_admin;
-                    header('Location: ' .$this->_index);
-                    return true;
+        if (isset($_POST['login'])) {
+            if ($this->_backend->validLogin(
+                    trim(strtolower($_POST['user'])),
+                    trim($_POST['password']))) {
+                $_SESSION['_currentUser'][$this->_channel] =
+                    trim(strtolower($_POST['user']));
+                $this->_user = 
+                    trim(strtolower($_POST['user']));
+                if ($this->_backend->isAdmin($this->_user)) {
+                    $this->_admin = true;
                 } else {
-                    echo "<p><strong class='error'>Invalid Login</strong></p>";
+                    $this->_admin = false;
                 }
+                $_SESSION['_currentUserAdmin'][$this->_channel] = $this->_admin;
+                session_write_close();
+                header('Location: ' .$this->_index);
+                return true;
+            } else {
+                $this->_savant->loginerror = "Invalid Login";
             }
+        } else {
+            $this->loginerror = false;
         }
-        echo $this->_quickForm->toHtml();
+        $this->_savant->formdata =
+            array(
+                array(
+                    'name' => 'user',
+                    'type' => 'text',
+                    'label' => 'User Name',
+                ),
+                array(
+                    'name' => 'password',
+                    'type' => 'password',
+                    'label' => 'Password',
+                ),
+                array(
+                    'name' => 'login',
+                    'type' => 'submit',
+                    'value' => 'Submit',
+                )
+            );
+        $this->_savant->display('login.tpl.php');
         echo '<a onclick="history.go(-1);">Go Back</a>';
     }
 
@@ -684,8 +696,7 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
     public function doMyAccount($fn)
     {
         try {
-            $channel_usernames = array_values($_SESSION['_currentUser']);
-            $info = $this->_backend->getMaintainer($channel_usernames[0]);
+            $info = $this->_backend->getMaintainer($_SESSION['_currentUser']);
             if (isset($_REQUEST['submitted'])) {
                 if ($this->_quickForm->validate()) {
                     $stuff = $this->_quickForm->getSubmitValues();
