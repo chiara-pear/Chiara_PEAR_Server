@@ -1,5 +1,5 @@
-<?xml version="1.0"?>
-<package xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" packagerversion="1.4.0a12" version="2.0" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" packagerversion="1.4.2" version="2.0" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
  <name>Chiara_PEAR_Server</name>
  <channel>chiara-local</channel>
  <summary>A lightweight pearweb-compatible channel server for hosting a PEAR channel</summary>
@@ -22,10 +22,16 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
   <email>davey@php.net</email>
   <active>yes</active>
  </lead>
- <date>2005-05-31</date>
- <time>23:33:33</time>
+ <lead>
+  <name>Clay Loveless</name>
+  <user>clay</user>
+  <email>clay@killersoft.com</email>
+  <active>yes</active>
+ </lead>
+ <date>2005-10-03</date>
+ <time>18:22:17</time>
  <version>
-  <release>0.18.1</release>
+  <release>0.18.2</release>
   <api>0.18.0</api>
  </version>
  <stability>
@@ -33,153 +39,155 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
   <api>alpha</api>
  </stability>
  <license uri="http://www.php.net/license">PHP License</license>
- <notes>Consolidate post-install scripts
-    fix invalid release exception error message</notes>
+ <notes>* Fixes bug which prevented non-admin leads from releasing.
+* Adds support for groupings of user handles by channel
+* Fixes bug relating to DB_DataObject configuration when channel database 
+  name is not the default.</notes>
  <contents>
   <dir baseinstalldir="Chiara/PEAR" name="/">
-   <file baseinstalldir="Chiara/PEAR" md5sum="351a9e38af3b04e3b84ba701e43353a2" name="data/DBDataObject/pearserver.ini" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="9c03de64449ab09c4c031cce668435d8" name="data/DBDataObject/pearserver.ini" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="9245dd65f9a98d7e372736b5f7f428a9" name="data/deprecatedpackages-chiara_pear_server-0.17.0.sql" role="data"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="24c374efc193f3483a3690a48f3683ba" name="data/pearserver.sql" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="854d541ec870d5b0f9a2860a08972849" name="data/handles-channel-0.18.2.sql" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="8d661a5a7c88eaf097edcfde86e3edae" name="data/pearserver.sql" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="73cf7006a8e0825da5ab6bfb7794f1fa" name="data/pear_server.css" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="c8727151021b67366e1abe2b2cc3f8f9" name="data/restsupport-0.18.0.sql" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="07ba3a53b03a622fb560e3cdbc30093a" name="data/upgrade-0.12.0_0.13.0.sql" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="4110a5fe9147a91cf149c1535186e9c6" name="examples/xmlrpc.php" role="doc"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="d0a32230f78482b0f22687f7eaf72105" name="Server/Backend/DBDataObject/Categories.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="f664b1e16e2f7850aa379199b43d4fbf" name="Server/Backend/DBDataObject/Channels.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="23240d57f6c258055891f193c26c7f68" name="Server/Backend/DBDataObject/Handles.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="917fd9ebee14b119dc1e3cdee55bda77" name="Server/Backend/DBDataObject/Maintainers.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="44286b6ff1f20c26fdc5484755724789" name="Server/Backend/DBDataObject/Packages.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="58d8fa33aef8e2507a675b0185d47785" name="Server/Backend/DBDataObject/Package_extras.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="7c37f9f66076c50914d23f264c3e13e7" name="Server/Backend/DBDataObject/Releases.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="d749330b985afce4214f227a98af981f" name="Server/Backend/DBDataObject.php" role="php">
-    <tasks:replace from="@data-dir@" to="data_dir" type="pear-config"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="1db94913761d31de34b7dfd5449c4fb5" name="Server/Backend/DBDataObject/Categories.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="30efeea0aae2b9b992cbffa1b29e0848" name="Server/Backend/DBDataObject/Channels.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="62e904297a241f7e9642e435a247e682" name="Server/Backend/DBDataObject/Handles.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="1e388122551a3d5ab18942ea20f66cf9" name="Server/Backend/DBDataObject/Maintainers.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="06d90ce23030bb8035bfd2d9971042d9" name="Server/Backend/DBDataObject/Packages.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="7a9bc94e801468b1825986c62f8ab850" name="Server/Backend/DBDataObject/Package_extras.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="041e1eeef782fa9000772f3bece2775a" name="Server/Backend/DBDataObject/Releases.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="9e51cab8bfd90e2618cdc602b4a430e8" name="Server/Backend/DBDataObject.php" role="php">
     <tasks:replace from="@php-dir@" to="php_dir" type="pear-config"/>
+    <tasks:replace from="@data-dir@" to="data_dir" type="pear-config"/>
    </file>
    <file baseinstalldir="Chiara/PEAR" md5sum="7be3af5b00b33f009009a46b8c914273" name="Server/Frontend/HTMLQuickForm.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="7d624a4764f11d42b908d1a689213b55" name="Server/Backend.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="10c98b7c6f29a4aef7f200dd7a73ce7d" name="Server/Backend.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="c5409863a5409f9a347a5be74102dcb8" name="Server/Exception.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="e7c92c79ed7d708a2e67b66dbdb62daf" name="Server/Frontend.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="b45466760ee1535b6fde965bd4ca3c84" name="Server/Maintainer.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="d2f5bf50575065424870baaee1bdd196" name="Server/Package.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="1d6d4efd6630cf1faa4e27cb261be953" name="Server/mysqlinstall.php" role="php">
-    <tasks:postinstallscript>
-     <paramgroup>
-      <id>questionCreate</id>
-      <param>
-       <name>doit</name>
-       <prompt>Create/Upgrade database for Chiara_PEAR_Server? All previous installations must run the script</prompt>
-       <type>string</type>
-       <default>yes</default>
-      </param>
-     </paramgroup>
-     <paramgroup>
-      <id>databaseSetup</id>
-      <param>
-       <name>database</name>
-       <prompt>Mysql database</prompt>
-       <type>string</type>
-       <default>pear</default>
-      </param>
-      <param>
-       <name>user</name>
-       <prompt>Mysql Username (must have create permision)</prompt>
-       <type>string</type>
-       <default>pear</default>
-      </param>
-      <param>
-       <name>password</name>
-       <prompt>Mysql password</prompt>
-       <type>string</type>
-       <default>pear</default>
-      </param>
-      <param>
-       <name>dbhost</name>
-       <prompt>Database Host</prompt>
-       <type>string</type>
-       <default>localhost</default>
-      </param>
-      <param>
-       <name>handle</name>
-       <prompt>Channel Administrator Handle (package.xml user tag)</prompt>
-       <type>string</type>
-      </param>
-      <param>
-       <name>name</name>
-       <prompt>Channel Name (server uri like pear.php.net)</prompt>
-       <type>string</type>
-      </param>
-     </paramgroup>
-     <paramgroup>
-      <id>channelCreate</id>
-      <param>
-       <name>alias</name>
-       <prompt>Suggested Channel Alias (like pear)</prompt>
-       <type>string</type>
-      </param>
-      <param>
-       <name>summary</name>
-       <prompt>Channel summary</prompt>
-       <type>string</type>
-      </param>
-     </paramgroup>
-     <paramgroup>
-      <id>administrator</id>
-      <param>
-       <name>name</name>
-       <prompt>Channel Administrator Real Name</prompt>
-       <type>string</type>
-      </param>
-      <param>
-       <name>email</name>
-       <prompt>Channel Administrator Email</prompt>
-       <type>string</type>
-      </param>
-      <param>
-       <name>password</name>
-       <prompt>Channel Administrator Password</prompt>
-       <type>string</type>
-      </param>
-     </paramgroup>
-     <paramgroup>
-      <id>files</id>
-      <param>
-       <name>pearconfigloc</name>
-       <prompt>PEAR Configuration File Location (pear.ini/.pearrc/pear.conf)</prompt>
-       <type>string</type>
-       <default>(Use default)</default>
-      </param>
-      <param>
-       <name>docroot</name>
-       <prompt>Path to document root (htdocs or public_html)</prompt>
-       <type>string</type>
-      </param>
-      <param>
-       <name>frontendphp</name>
-       <prompt>name of frontend.php HTML admin frontend file</prompt>
-       <type>string</type>
-      </param>
-      <param>
-       <name>uploadpath</name>
-       <prompt>temporary path to save uploaded releases in</prompt>
-       <type>string</type>
-      </param>
-      <param>
-       <name>port</name>
-       <prompt>port clients should connect to (443 is SSL, 80 is regular HTTP)</prompt>
-       <type>string</type>
-       <default>80</default>
-      </param>
-      <param>
-       <name>ssl</name>
-       <prompt>protocol clients should use to connect (http or https)</prompt>
-       <type>string</type>
-       <default>http</default>
-      </param>
-     </paramgroup>
-    </tasks:postinstallscript>
-    <tasks:replace from="@data-dir@" to="data_dir" type="pear-config"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="d42fda24093f6b96c6e7797328b132bc" name="Server/mysqlinstall.php" role="php">
     <tasks:replace from="@php-dir@" to="php_dir" type="pear-config"/>
+    <tasks:replace from="@data-dir@" to="data_dir" type="pear-config"/>
+    <tasks:postinstallscript>
+     <tasks:paramgroup>
+      <tasks:id>questionCreate</tasks:id>
+      <tasks:param>
+       <tasks:name>doit</tasks:name>
+       <tasks:prompt>Create/Upgrade database for Chiara_PEAR_Server? All previous installations must run the script</tasks:prompt>
+       <tasks:type>string</tasks:type>
+       <tasks:default>yes</tasks:default>
+      </tasks:param>
+     </tasks:paramgroup>
+     <tasks:paramgroup>
+      <tasks:id>databaseSetup</tasks:id>
+      <tasks:param>
+       <tasks:name>database</tasks:name>
+       <tasks:prompt>Mysql database</tasks:prompt>
+       <tasks:type>string</tasks:type>
+       <tasks:default>pear</tasks:default>
+      </tasks:param>
+      <tasks:param>
+       <tasks:name>user</tasks:name>
+       <tasks:prompt>Mysql Username (must have create permision)</tasks:prompt>
+       <tasks:type>string</tasks:type>
+       <tasks:default>pear</tasks:default>
+      </tasks:param>
+      <tasks:param>
+       <tasks:name>password</tasks:name>
+       <tasks:prompt>Mysql password</tasks:prompt>
+       <tasks:type>string</tasks:type>
+       <tasks:default>pear</tasks:default>
+      </tasks:param>
+      <tasks:param>
+       <tasks:name>dbhost</tasks:name>
+       <tasks:prompt>Database Host</tasks:prompt>
+       <tasks:type>string</tasks:type>
+       <tasks:default>localhost</tasks:default>
+      </tasks:param>
+      <tasks:param>
+       <tasks:name>handle</tasks:name>
+       <tasks:prompt>Channel Administrator Handle (package.xml user tag)</tasks:prompt>
+       <tasks:type>string</tasks:type>
+      </tasks:param>
+      <tasks:param>
+       <tasks:name>name</tasks:name>
+       <tasks:prompt>Channel Name (server uri like pear.php.net)</tasks:prompt>
+       <tasks:type>string</tasks:type>
+      </tasks:param>
+     </tasks:paramgroup>
+     <tasks:paramgroup>
+      <tasks:id>channelCreate</tasks:id>
+      <tasks:param>
+       <tasks:name>alias</tasks:name>
+       <tasks:prompt>Suggested Channel Alias</tasks:prompt>
+       <tasks:type>string</tasks:type>
+      </tasks:param>
+      <tasks:param>
+       <tasks:name>summary</tasks:name>
+       <tasks:prompt>Channel summary</tasks:prompt>
+       <tasks:type>string</tasks:type>
+      </tasks:param>
+     </tasks:paramgroup>
+     <tasks:paramgroup>
+      <tasks:id>administrator</tasks:id>
+      <tasks:param>
+       <tasks:name>name</tasks:name>
+       <tasks:prompt>Channel Administrator Real Name</tasks:prompt>
+       <tasks:type>string</tasks:type>
+      </tasks:param>
+      <tasks:param>
+       <tasks:name>email</tasks:name>
+       <tasks:prompt>Channel Administrator Email</tasks:prompt>
+       <tasks:type>string</tasks:type>
+      </tasks:param>
+      <tasks:param>
+       <tasks:name>password</tasks:name>
+       <tasks:prompt>Channel Administrator Password</tasks:prompt>
+       <tasks:type>string</tasks:type>
+      </tasks:param>
+     </tasks:paramgroup>
+     <tasks:paramgroup>
+      <tasks:id>files</tasks:id>
+      <tasks:param>
+       <tasks:name>pearconfigloc</tasks:name>
+       <tasks:prompt>PEAR Configuration File Location</tasks:prompt>
+       <tasks:type>string</tasks:type>
+      </tasks:param>
+      <tasks:param>
+       <tasks:name>docroot</tasks:name>
+       <tasks:prompt>Path to document root of web server for %s</tasks:prompt>
+       <tasks:type>string</tasks:type>
+      </tasks:param>
+      <tasks:param>
+       <tasks:name>frontendphp</tasks:name>
+       <tasks:prompt>name of frontend.php HTML admin frontend file</tasks:prompt>
+       <tasks:type>string</tasks:type>
+      </tasks:param>
+      <tasks:param>
+       <tasks:name>uploadpath</tasks:name>
+       <tasks:prompt>temporary path to save uploaded releases in</tasks:prompt>
+       <tasks:type>string</tasks:type>
+      </tasks:param>
+      <tasks:param>
+       <tasks:name>port</tasks:name>
+       <tasks:prompt>port clients should connect to (443 is SSL, 80 is regular HTTP)</tasks:prompt>
+       <tasks:type>string</tasks:type>
+       <tasks:default>80</tasks:default>
+      </tasks:param>
+      <tasks:param>
+       <tasks:name>ssl</tasks:name>
+       <tasks:prompt>protocol clients should use to connect (http or https)</tasks:prompt>
+       <tasks:type>string</tasks:type>
+       <tasks:default>http</tasks:default>
+      </tasks:param>
+     </tasks:paramgroup>
+    </tasks:postinstallscript>
    </file>
+   <file baseinstalldir="Chiara/PEAR" md5sum="d2f5bf50575065424870baaee1bdd196" name="Server/Package.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="3135f04354e34e2e16e258730de99e31" name="Server/Release.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="54d54f556d49362039630ed0d84afd46" name="Server.php" role="php"/>
   </dir>
@@ -190,7 +198,7 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
     <min>5.0.0</min>
    </php>
    <pearinstaller>
-    <min>1.4.0a12</min>
+    <min>1.4.2</min>
    </pearinstaller>
    <package>
     <name>DB_DataObject</name>
@@ -203,11 +211,6 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
     <min>3.2.2</min>
    </package>
   </required>
-  <optional>
-   <extension>
-    <name>xmlrpc</name>
-   </extension>
-  </optional>
   <group hint="Public frontend for users to browse channel packages" name="pearweb">
    <package>
     <name>Crtx_PEAR_Channel_Frontend</name>
@@ -416,8 +419,8 @@ fix package.info</notes>
    <date>2005-03-17</date>
    <license uri="http://www.php.net/license">PHP License</license>
    <notes>add check for weird addslashes/stripslashes behavior that seems to vary from system to system
-    add exception for invalid release upload
-    API is unchanged in this release</notes>
+add exception for invalid release upload
+API is unchanged in this release</notes>
   </release>
   <release>
    <version>
@@ -431,9 +434,9 @@ fix package.info</notes>
    <date>2005-03-21</date>
    <license uri="http://www.php.net/license">PHP License</license>
    <notes>* fix package.getDownloadURL and package.getDepDownloadURL when a different case is
-      passed in (smarty as opposed to Smarty)
-    * fix duplicate names listing for multiple leads in DBDataObject-&gt;listPackageMaintainers()
-    API is unchanged in this release</notes>
+  passed in (smarty as opposed to Smarty)
+* fix duplicate names listing for multiple leads in DBDataObject-&gt;listPackageMaintainers()
+API is unchanged in this release</notes>
   </release>
   <release>
    <version>
@@ -460,8 +463,8 @@ fix package.info</notes>
    <date>2005-04-18</date>
    <license uri="http://www.php.net/license">PHP License</license>
    <notes>Implement ssl, port, path options for channel server connection and xmlrpc.php file name
-    rename to Chiara_PEAR_Server
-    add ability to deprecate a package in favor of another</notes>
+rename to Chiara_PEAR_Server
+add ability to deprecate a package in favor of another</notes>
   </release>
   <release>
    <version>
@@ -475,10 +478,10 @@ fix package.info</notes>
    <date>2005-04-18</date>
    <license uri="http://www.php.net/license">PHP License</license>
    <notes>Implement REST support
-    fix subpackage support
-    fix package.info
-    fix PHP5 issue with visibility of Xmlrpc5 server contructor
-    add the ability to delete a package</notes>
+fix subpackage support
+fix package.info
+fix PHP5 issue with visibility of Xmlrpc5 server contructor
+add the ability to delete a package</notes>
   </release>
   <release>
    <version>
@@ -492,7 +495,23 @@ fix package.info</notes>
    <date>2005-05-31</date>
    <license uri="http://www.php.net/license">PHP License</license>
    <notes>Consolidate post-install scripts
-    fix invalid release exception error message</notes>
+fix invalid release exception error message</notes>
+  </release>
+  <release>
+   <version>
+    <release>0.18.2</release>
+    <api>0.18.0</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2005-10-02</date>
+   <license>PHP License</license>
+   <notes>* Fixes bug which prevented non-admin leads from releasing.
+* Adds support for groupings of user handles by channel
+* Fixes bug relating to DB_DataObject configuration when channel database 
+  name is not the default.</notes>
   </release>
  </changelog>
 </package>

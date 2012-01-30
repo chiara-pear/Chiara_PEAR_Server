@@ -6,19 +6,15 @@ require_once 'DB/DataObject.php';
 
 class Chiara_PEAR_Server_Backend_DBDataObject_Categories extends DB_DataObject 
 {
-
     ###START_AUTOCODE
     /* the code below is auto generated do not remove the above tag */
 
-    var $__table = 'categories';                     // table name
-    var $id;                                         // string(25)  not_null primary_key
-    var $channel;                                    // string(25)  not_null primary_key
-    var $name;                                       // string(80)  not_null primary_key
-    var $description;                                // string(255)  not_null
-    var $alias;                                      // string(255)  not_null blob
-
-    /* ZE2 compatibility trick*/
-    function __clone() { return $this;}
+    public $__table = 'categories';                      // table name
+    public $id;                              // int(6)  not_null primary_key
+    public $channel;                         // string(255)  not_null
+    public $name;                            // string(255)  not_null
+    public $description;                     // blob(65535)  not_null blob
+    public $alias;                           // string(50)  
 
     /* Static get */
     function staticGet($k,$v=NULL) { return DB_DataObject::staticGet('Chiara_PEAR_Server_Backend_DBDataObject_Categories',$k,$v); }

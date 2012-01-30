@@ -109,7 +109,7 @@ abstract class Chiara_PEAR_Server_Backend
      * @param string
      * @return boolean
      */
-    abstract public function isDeprecatedPackage($channel, $package);
+    abstract public function isDeprecatedPackage($package);
 
     abstract public function releaseExists(Chiara_PEAR_Server_Release $release);
 

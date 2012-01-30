@@ -45,13 +45,14 @@ CREATE TABLE channels (
 #
 
 CREATE TABLE handles (
+  channel varchar(100) NOT NULL default '',
   handle varchar(20) NOT NULL default '',
   name varchar(255) NOT NULL default '',
   email varchar(255) NOT NULL default '',
   uri varchar(255) NOT NULL default '',
   password varchar(50) NOT NULL default '',
   admin int(11) NOT NULL default '0',
-  PRIMARY KEY  (handle)
+  PRIMARY KEY  (channel,handle)
 );
 # --------------------------------------------------------
 

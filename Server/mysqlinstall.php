@@ -19,6 +19,7 @@ class Server_mysqlinstall_postinstall
     var $pearconfigloc;
     var $dbhost;
     var $databaseExists;
+    var $fixHandles = false;
     function init(&$config, &$pkg, $lastversion)
     {
         $this->_config = &$config;
@@ -28,6 +29,24 @@ class Server_mysqlinstall_postinstall
         $this->lastversion = $lastversion;
         $this->databaseExists = false;
         return true;
+    }
+
+    function postProcessPrompts($prompts, $section)
+    {
+        switch ($section) {
+            case 'channelCreate' :
+                $prompts[0]['default'] = array_shift($a = explode('.', $this->channel));
+            break;
+            case 'files' :
+                $conffile = $this->_config->getConfFile('user');
+                if (!file_exists($conffile)) {
+                    $conffile = $this->_config->getConfFile('system');
+                }
+                $prompts[0]['default'] = $conffile;
+                $prompts[1]['prompt'] = sprintf($prompts[1]['prompt'], $this->channel);
+            break;
+        }
+        return $prompts;
     }
 
     function run($answers, $phase)
@@ -139,9 +158,9 @@ class Server_mysqlinstall_postinstall
     function getDBConnection()
     {
         if (extension_loaded('mysqli')) {
-            $conn = @mysqli_connect($this->dbhost, $this->user, $this->password);
+            $conn = mysqli_connect($this->dbhost, $this->user, $this->password);
         } else {
-            $conn = @mysql_connect($this->dbhost, $this->user, $this->password);
+            $conn = mysql_connect($this->dbhost, $this->user, $this->password);
         }
         if (!$conn) {
             $this->_ui->outputData('Connection to mysql server failed');
@@ -246,99 +265,145 @@ class Server_mysqlinstall_postinstall
         if (!$conn) {
             return false;
         }
+        if ($this->db != 'pearserver') {
+            $ds = DIRECTORY_SEPARATOR;
+            $this->_ui->outputData('Copying DB_DataObject config file to "@data-dir@' .
+                $ds . 'Chiara_PEAR_Server' . $ds . 'data' . $ds . 'DBDataObject' .
+                $ds . $this->db . '.ini"');
+            copy('@data-dir@' . $ds . 'Chiara_PEAR_Server' . $ds . 'data' . $ds .
+                    'DBDataObject' . $ds . 'pearserver.ini',
+                '@data-dir@' . $ds . 'Chiara_PEAR_Server' . $ds . 'data' . $ds .
+                    'DBDataObject' . $ds . $this->db . '.ini');
+        }
         if (extension_loaded('mysqli')) {
             $query = mysqli_select_db($conn, $this->db);
         } else {
             $query = mysql_select_db($this->db, $conn);
         }
-        if ($this->lastversion) {
-            if ($query) {
-                // upgrading?
-                if (extension_loaded('mysqli')) {
-                    $query = @mysqli_query($conn, 'SELECT deprecated_package FROM packages');
-                } else {
-                    $query = @mysql_query('SELECT deprecated_package FROM packages', $conn);
-                }
-                if (!$query) {
-                    $a = $this->updateDatabase(
-             '@data-dir@/Chiara_PEAR_Server/data/deprecatedpackages-chiara_pear_server-0.17.0.sql',
-             'updating database to add deprecated package support', $conn);
-                    if (!$a) {
-                        return $a;
-                    }
-                }
-                if (extension_loaded('mysqli')) {
-                    $query = @mysqli_query($conn, 'SELECT rest_support FROM channels');
-                } else {
-                    $query = @mysql_query('SELECT rest_support FROM channels', $conn);
-                }
-                if (!$query) {
-                    $a = $this->updateDatabase(
-                        '@data-dir@/Chiara_PEAR_Server/data/restsupport-0.18.0.sql',
-                        'updating database to add REST xml support', $conn);
-                    if (!$a) {
-                        return $a;
-                    }
-                }
-                if (extension_loaded('mysqli')) {
-                    $check = @mysqli_query($conn, 'SELECT * FROM categories');
-                } else {
-                    $check = @mysql_query('SELECT * FROM categories', $conn);
-                }
-                if ($check) {
-                    $this->_ui->outputData('database is already upgraded');
-                    $this->closeDB($conn);
-                    return $this->checkSetup(); // tables already updated
-                }
-                if (extension_loaded('mysqli')) {
-                    $query = mysqli_select_db($conn, $answers['database']);
-                } else {
-                    $query = mysql_select_db($answers['database'], $conn);
-                }
+        if ($this->lastversion !== null) {        
+            if ($this->lastversion) {
                 if ($query) {
-                    $a = $this->updateDatabase(
-                        '@data-dir@/Chiara_PEAR_Server/data/upgrade-0.12.0_0.13.0.sql', false, $conn);
-                    if (!$a) {
+                    // upgrading?
+                    // Deprecated packages upgrade
+                    if (extension_loaded('mysqli')) {
+                        $query = @mysqli_query($conn, 'SELECT deprecated_package FROM packages');
+                    } else {
+                        $query = @mysql_query('SELECT deprecated_package FROM packages', $conn);
+                    }
+                    if (!$query) {
+                        $a = $this->updateDatabase(
+                 '@data-dir@/Chiara_PEAR_Server/data/deprecatedpackages-chiara_pear_server-0.17.0.sql',
+                 'updating database to add deprecated package support', $conn);
+                        if (!$a) {
+                            return $a;
+                        }
+                    }
+                    // handles-channel upgrade
+                    if (extension_loaded('mysqli')) {
+                        $query = @mysqli_query($conn, 'SELECT channel FROM handles');
+                    } else {
+                        $query = @mysql_query('SELECT channel FROM handles', $conn);
+                    }
+                    if (!$query) {
+                        $a = $this->updateDatabase(
+                            '@data-dir@/Chiara_PEAR_Server/data/handles-channel-0.18.2.sql',
+                            'updating database to add support for grouping handles by channel', $conn);
+                        if (!$a) {
+                            return $a;
+                        }
+                        $this->fixHandles = true;
+                    }
+                    // REST support upgrade
+                    if (extension_loaded('mysqli')) {
+                        $query = @mysqli_query($conn, 'SELECT rest_support FROM channels');
+                    } else {
+                        $query = @mysql_query('SELECT rest_support FROM channels', $conn);
+                    }
+                    if (!$query) {
+                        $a = $this->updateDatabase(
+                            '@data-dir@/Chiara_PEAR_Server/data/restsupport-0.18.0.sql',
+                            'updating database to add REST xml support', $conn);
+                        if (!$a) {
+                            return $a;
+                        }
+                    }
+                    // Categories support upgrade
+                    if (extension_loaded('mysqli')) {
+                        $check = @mysqli_query($conn, 'SELECT * FROM categories');
+                    } else {
+                        $check = @mysql_query('SELECT * FROM categories', $conn);
+                    }
+                    if ($check) {
+                        $this->_ui->outputData('database is already upgraded');
                         $this->closeDB($conn);
-                        return $a;
+                        return $this->checkSetup(); // tables already updated
                     }
-                }
-                return $this->checkSetup();
-            }
-        } else {
-            if ($query) {
-                $this->databaseExists = true;
-                if (extension_loaded('mysqli')) {
-                    $query = @mysqli_query($conn, 'SELECT rest_support FROM channels');
-                } else {
-                    $query = @mysql_query('SELECT rest_support FROM channels', $conn);
-                }
-                if (!$query) {
-                    $a = $this->updateDatabase(
-                        '@data-dir@/Chiara_PEAR_Server/data/restsupport-0.18.0.sql',
-                        'updating database to add REST xml support', $conn);
-                    if (!$a) {
-                        return $a;
+                    if (extension_loaded('mysqli')) {
+                        $query = mysqli_select_db($conn, $answers['database']);
+                    } else {
+                        $query = mysql_select_db($answers['database'], $conn);
                     }
-                }
-                if (extension_loaded('mysqli')) {
-                    $query = @mysqli_query($conn, 'SELECT channel_deprecated FROM packages');
-                } else {
-                    $query = @mysql_query('SELECT channel_deprecated FROM packages', $conn);
-                }
-                if (!$query) {
-                    $a = $this->updateDatabase(
-             '@data-dir@/Chiara_PEAR_Server/data/deprecatedpackages-chiara_pear_server-0.17.0.sql',
-             'updating database to add deprecated package support', $conn);
-                    if (!$a) {
-                        $this->closeDB($conn);
-                        return $a;
+                    if ($query) {
+                        $a = $this->updateDatabase(
+                            '@data-dir@/Chiara_PEAR_Server/data/upgrade-0.12.0_0.13.0.sql', false, $conn);
+                        if (!$a) {
+                            $this->closeDB($conn);
+                            return $a;
+                        }
                     }
-                } else {
-                    $this->_ui->outputData('database is already setup');
+                    return $this->checkSetup();
                 }
-                $this->closeDB($conn);
-                return $this->checkSetup();
+            } else {
+                if ($query) {
+                    $this->databaseExists = true;
+                    if (extension_loaded('mysqli')) {
+                        $query = @mysqli_query($conn, 'SELECT rest_support FROM channels');
+                    } else {
+                        $query = @mysql_query('SELECT rest_support FROM channels', $conn);
+                    }
+                    if (!$query) {
+                        $a = $this->updateDatabase(
+                            '@data-dir@/Chiara_PEAR_Server/data/restsupport-0.18.0.sql',
+                            'updating database to add REST xml support', $conn);
+                        if (!$a) {
+                            return $a;
+                        }
+                    }
+    
+                    // handles-channel upgrade
+                    if (extension_loaded('mysqli')) {
+                        $query = @mysqli_query($conn, 'SELECT channel FROM handles');
+                    } else {
+                        $query = @mysql_query('SELECT channel FROM handles', $conn);
+                    }
+                    if (!$query) {
+                        $a = $this->updateDatabase(
+                            '@data-dir@/Chiara_PEAR_Server/data/handles-channel-0.18.2.sql',
+                            'updating database to add support for grouping handles by channel', $conn);
+                        if (!$a) {
+                            return $a;
+                        }
+                    }
+    
+                    if (extension_loaded('mysqli')) {
+                        $query = @mysqli_query($conn, 'SELECT channel_deprecated FROM packages');
+                    } else {
+                        $query = @mysql_query('SELECT channel_deprecated FROM packages', $conn);
+                    }
+                    if (!$query) {
+                        $a = $this->updateDatabase(
+                 '@data-dir@/Chiara_PEAR_Server/data/deprecatedpackages-chiara_pear_server-0.17.0.sql',
+                 'updating database to add deprecated package support', $conn);
+                        if (!$a) {
+                            $this->closeDB($conn);
+                            return $a;
+                        }
+                    } else {
+                        $this->_ui->outputData('database is already setup');
+                    }
+                    $this->closeDB($conn);
+                    return $this->checkSetup();
+                }
             }
         }
         if (extension_loaded('mysqli')) {
@@ -359,6 +424,7 @@ class Server_mysqlinstall_postinstall
                     $this->closeDB($conn);
                     return false;
                 }
+                return true;
             } else {
                 if (extension_loaded('mysqli')) {
                     $this->_ui->outputData(mysqli_error($conn));
@@ -378,46 +444,6 @@ class Server_mysqlinstall_postinstall
     function createChannel($answers)
     {
         $this->alias = $answers['alias'];
-        if (!$this->lastversion) {
-            include_once 'DB/DataObject.php';
-            if (!class_exists('DB_DataObject')) {
-                $this->_ui->outputData('DB_DataObject is required to use Chiara_PEAR_Server');
-                return false;
-            }
-            $options = &PEAR::getStaticProperty('DB_DataObject','options');
-            $type = extension_loaded('mysqli') ? 'mysqli' : 'mysql';
-            $phpdir = str_replace('\\', '/', '@php-dir@');
-            $datadir = str_replace('\\', '/', '@data-dir@');
-            $options = array(
-                'database'         => $type . '://' . $this->user . ':' . $this->password .
-                    '@' . $this->dbhost . '/' . $this->db,
-                'schema_location'  => $datadir . '/Chiara_PEAR_Server/data/DBDataObject',
-                'class_location'   => $phpdir . '/Chiara/PEAR/Server/Backend/DBDataObject/',
-                'require_prefix'   => 'Chiara/PEAR/Server/Backend/DBDataObject/',
-                'class_prefix'     => 'Chiara_PEAR_Server_Backend_DBDataObject_',
-            );
-            $dbo = DB_DataObject::factory('channels');
-            $dbo->channel = $answers['name'];
-            $dbo->summary = $answers['summary'];
-            $dbo->alias = $answers['alias'];
-            if (!$dbo->find()) {
-                $dbo->channel = $answers['name'];
-                $dbo->summary = $answers['summary'];
-                $dbo->alias = $answers['alias'];
-                if (!$dbo->insert()) {
-                    $this->_ui->outputData('Creation of channel failed');
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    function setupAdministrator($answers)
-    {
-        if ($this->lastversion) {
-            return true;
-        }
         include_once 'DB/DataObject.php';
         if (!class_exists('DB_DataObject')) {
             $this->_ui->outputData('DB_DataObject is required to use Chiara_PEAR_Server');
@@ -435,21 +461,65 @@ class Server_mysqlinstall_postinstall
             'require_prefix'   => 'Chiara/PEAR/Server/Backend/DBDataObject/',
             'class_prefix'     => 'Chiara_PEAR_Server_Backend_DBDataObject_',
         );
-        $this->_ui->outputData('Add the primary administrator');
+        $dbo = DB_DataObject::factory('channels');
+        $dbo->channel = $this->channel;
+        if ($dbo->find()) {
+            $update = true;
+        } else {
+            $update = false;
+        }
+        $dbo->summary = $answers['summary'];
+        $dbo->alias = $answers['alias'];
+        if (!$dbo->find()) {
+            $dbo->channel = $this->channel;
+            $dbo->summary = $answers['summary'];
+            $dbo->alias = $answers['alias'];
+            $result = ($update ? $dbo->update() : $dbo->insert());
+            if (!$result) {
+                $this->_ui->outputData('Creation of channel failed');
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function setupAdministrator($answers)
+    {
+        include_once 'DB/DataObject.php';
+        if (!class_exists('DB_DataObject')) {
+            $this->_ui->outputData('DB_DataObject is required to use Chiara_PEAR_Server');
+            return false;
+        }
+        $options = &PEAR::getStaticProperty('DB_DataObject','options');
+        $type = extension_loaded('mysqli') ? 'mysqli' : 'mysql';
+        $phpdir = str_replace('\\', '/', '@php-dir@');
+        $datadir = str_replace('\\', '/', '@data-dir@');
+        $options = array(
+            'database'         => $type . '://' . $this->user . ':' . $this->password .
+                '@' . $this->dbhost . '/' . $this->db,
+            'schema_location'  => $datadir . '/Chiara_PEAR_Server/data/DBDataObject',
+            'class_location'   => $phpdir . '/Chiara/PEAR/Server/Backend/DBDataObject/',
+            'require_prefix'   => 'Chiara/PEAR/Server/Backend/DBDataObject/',
+            'class_prefix'     => 'Chiara_PEAR_Server_Backend_DBDataObject_',
+        );
         $dbo = DB_DataObject::factory('handles');
         $dbo->handle = $this->handle;
         PEAR::pushErrorHandling(PEAR_ERROR_RETURN);
         if (!$dbo->find()) {
+            $this->_ui->outputData('Add the primary administrator');
             $dbo->name = $answers['name'];
             $dbo->email = $answers['email'];
             $dbo->password = md5($answers['password']);
             $dbo->admin = 1;
+            $dbo->channel = $this->channel;
             $a = $dbo->insert();
         } else {
             $dbo->name = $answers['name'];
             $dbo->email = $answers['email'];
             $dbo->password = md5($answers['password']);
             $dbo->admin = 1;
+            $dbo->channel = $this->channel;
+            $this->_ui->outputData('Update the primary administrator');
             $a = $dbo->update();
         }
         PEAR::popErrorHandling();
@@ -469,6 +539,9 @@ class Server_mysqlinstall_postinstall
     {
         $this->pearconfigloc = $answers['pearconfigloc'];
         $this->webroot = $answers['docroot'];
+        $this->ssl = ($answers['ssl'] == 'https');
+        $this->port = $answers['port'];
+        $this->frontend = $answers['frontendphp'];
         $options = &PEAR::getStaticProperty('DB_DataObject','options');
         $type = extension_loaded('mysqli') ? 'mysqli' : 'mysql';
         $phpdir = str_replace('\\', '/', '@php-dir@');
@@ -482,6 +555,11 @@ class Server_mysqlinstall_postinstall
             'class_prefix'     => 'Chiara_PEAR_Server_Backend_DBDataObject_',
         );
         require_once 'DB/DataObject.php';
+        if ($this->fixHandles) {
+            $dbo = DB_DataObject::factory('handles');
+            $dbo->channel = $this->channel;
+            $dbo->update();
+        }
         $dbo = DB_DataObject::factory('channels');
         $dbo->channel = $this->channel;
         if (!$dbo->find(true)) {
@@ -507,9 +585,6 @@ class Server_mysqlinstall_postinstall
             $this->_registry->updateChannel($chan);
         }
         $xml = $chan->toXml();
-        $this->ssl = ($answers['ssl'] == 'https');
-        $this->port = $answers['port'];
-        $this->frontend = $answers['frontendphp'];
         include_once 'System.php';
         if (!class_exists('System')) {
             $this->_ui->outputData('System class required to create server files');
@@ -539,12 +614,10 @@ class Server_mysqlinstall_postinstall
 
         // create frontend.php
         $extraconf = '';
-        if ($this->pearconfigloc != '(Use default)') {
-            if (@file_exists($this->pearconfigloc)) {
-                $extraconf = "require_once 'PEAR/Config.php';\n" .
-                             'PEAR_Config::singleton("' . addslashes($this->pearconfigloc) . "\",\n" .
-                             '"' . addslashes($this->pearconfigloc) . "\");\n";
-            }
+        if (@file_exists($this->pearconfigloc)) {
+            $extraconf = "require_once 'PEAR/Config.php';\n" .
+                         'PEAR_Config::singleton("' . addslashes($this->pearconfigloc) . "\",\n" .
+                         '"' . addslashes($this->pearconfigloc) . "\");\n";
         }
         $type = extension_loaded('mysqli') ? 'mysqli' : 'mysql';
         $config = 'array(\'database\' => \'' .
@@ -577,7 +650,7 @@ $server->run();
         }
         if (!file_exists($answers['docroot'] . DIRECTORY_SEPARATOR . 'pear_server.css')) {
             $b = @copy(str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR),
-                '@data-dir@/PEAR_Server/data/pear_server.css'), $answers['docroot'] .
+                '@data-dir@/Chiara_PEAR_Server/data/pear_server.css'), $answers['docroot'] .
                 DIRECTORY_SEPARATOR . 'pear_server.css');
             if ($b) {
                 $this->_ui->outputData('Successfully created ' .
@@ -613,8 +686,8 @@ $server->run();
         require_once 'Chiara/PEAR/Server/Backend/DBDataObject.php';
         $options = &PEAR::getStaticProperty('DB_DataObject','options');
         $type = extension_loaded('mysqli') ? 'mysqli' : 'mysql';
-        $phpdir = str_replace('\\', '/', 'C:\php5\pear');
-        $datadir = str_replace('\\', '/', 'C:\php5\pear\data');
+        $phpdir = str_replace('\\', '/', '@php-dir@');
+        $datadir = str_replace('\\', '/', '@data-dir@');
         $options = array(
             'database'         => $type . '://' . $this->user . ':' . $this->password .
                 '@' . $this->dbhost . '/' . $this->db,

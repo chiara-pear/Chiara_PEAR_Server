@@ -3,7 +3,7 @@ require_once 'DB/DataObject.php';
 require_once 'Chiara/PEAR/Server/Backend.php';
 require_once 'Chiara/PEAR/Server/Exception.php';
 /**
- * @version $Id: DBDataObject.php,v 1.40 2005/05/02 17:38:56 cellog Exp $
+ * @version $Id: DBDataObject.php,v 1.46 2005/10/01 23:06:57 cellog Exp $
  * @author Greg Beaver <cellog@php.net>
  */
 class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
@@ -24,15 +24,16 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
     public function isAdmin($user)
     {
         $handles = DB_DataObject::factory('handles');
+        $handles->channel = $this->_channel;
         $handles->handle = $user;
         $handles->admin = 1;
         return $handles->find();
     }
 
-    public function isDeprecatedPackage($channel, $package)
+    public function isDeprecatedPackage($package)
     {
         $packages = DB_DataObject::factory('packages');
-        $packages->channel = $channel;
+        $packages->channel = $this->_channel;
         $packages->package = $package;
         if ($packages->find(true)) {
             if ($packages->deprecated_package) {
@@ -47,6 +48,7 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
     public function validLogin($user, $password)
     {
         $handles = DB_DataObject::factory('handles');
+        $handles->channel = $this->_channel;
         $handles->handle = $user;
         $handles->password = md5($password);
         return $handles->find();
@@ -149,6 +151,12 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
                 }
                 $maintainers->update();
             } else {
+                $handles = DB_DataObject::factory('handles');
+                $handles->handle = $maintainer['handle'];
+                if (!$handles->find()) {
+                    throw new Chiara_PEAR_Server_ExceptionMaintainerDoesntExist(
+                        $maintainer['handle']);
+                }
                 $maintainers->role = $maintainer['role'];
                 $maintainers->insert();
             }
@@ -227,7 +235,7 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
             }
             $pdir = $this->_restdir . DIRECTORY_SEPARATOR . 'p';
 
-            $info = '<?xml version="1.0"?>
+            $info = '<?xml version="1.0" encoding="iso-8859-1" ?>
 <a xmlns="http://pear.php.net/dtd/rest.allpackages"
     xsi:schemaLocation="http://pear.php.net/dtd/rest.allpackages
     http://pear.php.net/dtd/rest.allpackages.xsd">
@@ -265,7 +273,7 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
                     System::mkdir(array('-p', $pdir . DIRECTORY_SEPARATOR . strtolower($package)));
                     @chmod($pdir . DIRECTORY_SEPARATOR . strtolower($package), 0777);
                 }
-                $info = '<?xml version="1.0"?>
+                $info = '<?xml version="1.0" encoding="iso-8859-1" ?>
 <m xmlns="http://pear.php.net/dtd/rest.packagemaintainers"
     xsi:schemaLocation="http://pear.php.net/dtd/rest.packagemaintainers
     http://pear.php.net/dtd/rest.packagemaintainers.xsd">
@@ -305,12 +313,12 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
             $releasedata->package = $package;
             $releasedata->orderby('releasedate DESC');
             $rdir = $this->_restdir . DIRECTORY_SEPARATOR . 'r';
+            // start from scratch to remove any errant files after a release is pulled
+            System::rm($rdir . DIRECTORY_SEPARATOR . strtolower($package));
             if (!$releasedata->find(false)) {
-                // remove stragglers if no releases are found
-                @unlink($rdir . DIRECTORY_SEPARATOR . strtolower($package));
                 return;
             }
-            $info = '<?xml version="1.0"?>
+            $info = '<?xml version="1.0" encoding="iso-8859-1" ?>
 <a xmlns="http://pear.php.net/dtd/rest.allreleases"
     xsi:schemaLocation="http://pear.php.net/dtd/rest.allreleases
     http://pear.php.net/dtd/rest.allreleases.xsd">
@@ -318,6 +326,37 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
  <c>' . $this->_channel . '</c>
 ';
             while ($releasedata->fetch()) {
+                if (!class_exists('PEAR_PackageFile_Parser_v2')) {
+                    require_once 'PEAR/PackageFile/Parser/v2.php';
+                }
+                if (!class_exists('PEAR/Config.php')) {
+                    require_once 'PEAR/Config.php';
+                }
+                $pkg = new PEAR_PackageFile_Parser_v2;
+                $c = PEAR_Config::singleton();
+                $pkg->setConfig($c);
+                $pf = $pkg->parse($releasedata->packagexml, '');
+                if ($compat = $pf->getCompatible()) {
+                    if (!isset($compat[0])) {
+                        $compat = array($compat);
+                    }
+                    foreach ($compat as $entry) {
+                        $extra .= '<co><c>' . $entry['channel'] . '</c>' .
+                            '<p>' . $entry['name'] . '</p>' .
+                            '<min>' . $entry['min'] . '</min>' .
+                            '<max>' . $entry['max'] . '</max>';
+                        if (isset($entry['exclude'])) {
+                            if (!is_array($entry['exclude'])) {
+                                $entry['exclude'] = array($entry['exclude']);
+                            }
+                            foreach ($entry['exclude'] as $exclude) {
+                                $extra .= '<x>' . $exclude . '</x>';
+                            }
+                        }
+                        $extra .= '</co>
+';
+                    }
+                }
                 if (!isset($latest)) {
                     $latest = $releasedata->version;
                 }
@@ -422,7 +461,7 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
                 @chmod($rdir . DIRECTORY_SEPARATOR . strtolower($package), 0777);
             }
 
-            $info = '<?xml version="1.0"?>
+            $info = '<?xml version="1.0" encoding="iso-8859-1" ?>
 <r xmlns="http://pear.php.net/dtd/rest.release"
     xsi:schemaLocation="http://pear.php.net/dtd/rest.release
     http://pear.php.net/dtd/rest.release.xsd">
@@ -673,7 +712,7 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
                 System::mkdir(array('-p', $cdir . DIRECTORY_SEPARATOR . urlencode($category['name'])));
                 @chmod($cdir . DIRECTORY_SEPARATOR . urlencode($category['name']), 0777);
             }
-            $info = '<?xml version="1.0"?>
+            $info = '<?xml version="1.0" encoding="iso-8859-1" ?>
 <c xmlns="http://pear.php.net/dtd/rest.category"
     xsi:schemaLocation="http://pear.php.net/dtd/rest.category
     http://pear.php.net/dtd/rest.category.xsd">
@@ -687,7 +726,7 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
                 DIRECTORY_SEPARATOR . 'info.xml', $info);
             @chmod($cdir . DIRECTORY_SEPARATOR . urlencode($category['name']) .
                 DIRECTORY_SEPARATOR . 'info.xml', 0666);
-            $list = '<?xml version="1.0"?>
+            $list = '<?xml version="1.0" encoding="iso-8859-1" ?>
 <l xmlns="http://pear.php.net/dtd/rest.categorypackages"
     xsi:schemaLocation="http://pear.php.net/dtd/rest.categorypackages
     http://pear.php.net/dtd/rest.categorypackages.xsd">
@@ -770,7 +809,7 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
             } else {
                 $deprecated = '';
             }
-            $info = '<?xml version="1.0"?>
+            $info = '<?xml version="1.0" encoding="iso-8859-1" ?>
 <p xmlns="http://pear.php.net/dtd/rest.package"
     xsi:schemaLocation="http://pear.php.net/dtd/rest.package
     http://pear.php.net/dtd/rest.package.xsd">
@@ -1075,11 +1114,13 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
     public function deleteMaintainer($maintainer)
     {
         $handle = DB_DataObject::factory('handles');
+        $handle->channel = $this->_channel;
         $handle->handle = $maintainer->handle;
         if (!$handle->find(true)) {
             throw new Chiara_PEAR_Server_ExceptionMaintainerDoesntExist($handle->handle);
         }
         $packages = DB_DataObject::factory('maintainers');
+        $packages->channel = $channel;
         $packages->handle = $handle->handle;
         if ($packages->find()) {
             throw new Chiara_PEAR_Server_ExceptionCannotDeleteMaintainer($handle->handle);
@@ -1116,6 +1157,7 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
     public function addMaintainer(Chiara_PEAR_Server_Maintainer $maintainer)
     {
         $handle = DB_DataObject::factory('handles');
+        $handle->channel = $this->_channel;
         $handle->handle = $maintainer->handle;
         if ($handle->find()) {
             throw new Chiara_PEAR_Server_ExceptionMaintainerExists($handle->handle);
@@ -1153,7 +1195,7 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
             } else {
                 $uri = '';
             }
-            $info = '<?xml version="1.0"?>
+            $info = '<?xml version="1.0" encoding="iso-8859-1" ?>
 <m xmlns="http://pear.php.net/dtd/rest.maintainer"
     xsi:schemaLocation="http://pear.php.net/dtd/rest.maintainer
     http://pear.php.net/dtd/rest.maintainer.xsd">
@@ -1174,6 +1216,7 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
     public function updateMaintainer(Chiara_PEAR_Server_Maintainer $maintainer)
     {
         $handle = DB_DataObject::factory('handles');
+        $handle->channel = $this->_channel;
         $handle->handle = $maintainer->handle;
         if (!$handle->find()) {
             throw new Chiara_PEAR_Server_ExceptionMaintainerDoesntExist($handle->handle);
@@ -1194,6 +1237,7 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
     public function getMaintainer($maintainer)
     {
         $handle = DB_DataObject::factory('handles');
+        $handle->channel = $this->_channel;
         $handle->handle = $maintainer;
         if (!$handle->find(true)) {
             throw new Chiara_PEAR_Server_ExceptionMaintainerDoesntExist($handle->handle);
@@ -1208,6 +1252,7 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
     public function listMaintainers($returnhandles = false)
     {
         $maintainers = DB_DataObject::factory('handles');
+        $maintainers->channel = $this->_channel;
         $ret = array();
         if ($maintainers->find()) {
             while ($maintainers->fetch()) {
@@ -1229,10 +1274,12 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
     {
         $maintainers = DB_DataObject::factory('maintainers');
         $maintainers->package = $package;
+        $maintainers->channel = $this->_channel;
         $handle = DB_DataObject::factory('handles');
         $ret = array();
         if ($maintainers->find()) {
             while ($maintainers->fetch()) {
+                $handle->channel = $this->_channel;
                 $handle->handle = $maintainers->handle;
                 $handle->name = null;
                 $handle->email = null;
