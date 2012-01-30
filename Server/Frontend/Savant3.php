@@ -576,6 +576,8 @@ class Chiara_PEAR_Server_Frontend_Savant3 extends Chiara_PEAR_Server_Frontend
                         $info->package = $package;
                         if ($this->_backend->updatePackageMaintainer($info)) {
                             $this->_quickForm->addElement('header', '', 'Changes to ' . $info->handle . ' Saved');
+                            $this->_backend->savePackageMaintainersREST($info->package);
+                            $this->_backend->savePackageMaintainersWithRoleREST($info->package);
                         } else {
                             $this->_quickForm->addElement('header', '', 'Changes to ' . $info->handle . ' Failed!');
                         }
@@ -591,6 +593,8 @@ class Chiara_PEAR_Server_Frontend_Savant3 extends Chiara_PEAR_Server_Frontend
                         try {
                             if ($this->_backend->addPackageMaintainer($info)) {
                                 $this->_quickForm->addElement('header', '', 'Addition of ' . $info->handle . ' to Package Succeeded');
+                                $this->_backend->savePackageMaintainersREST($info->package);
+                                $this->_backend->savePackageMaintainersWithRoleREST($info->package);
                             } else {
                                 $this->_quickForm->addElement('header', '', 'Addition of ' . $info->handle . ' Failed!');
                             }

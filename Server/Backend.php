@@ -121,6 +121,11 @@ abstract class Chiara_PEAR_Server_Backend
         return $this->_rest->savePackageMaintainersREST($package);
     }
 
+    public function savePackageMaintainersWithRoleREST($package)
+    {
+        return $this->_rest->savePackageMaintainersWithRoleREST($package);
+    }
+
     /**
      * @param string
      * @param string

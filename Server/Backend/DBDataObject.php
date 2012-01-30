@@ -3,7 +3,7 @@ require_once 'DB/DataObject.php';
 require_once 'Chiara/PEAR/Server/Backend.php';
 require_once 'Chiara/PEAR/Server/Exception.php';
 /**
- * @version $Id: DBDataObject.php 275 2007-03-29 22:06:56Z bbieber $
+ * @version $Id: DBDataObject.php 309 2009-04-28 16:10:04Z  $
  * @author Greg Beaver <cellog@php.net>
  */
 class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
@@ -226,6 +226,7 @@ class Chiara_PEAR_Server_Backend_DBDataObject extends Chiara_PEAR_Server_Backend
                 $release->getDependencies());
             $this->savePackageREST($releasedata->package);
             $this->savePackageMaintainersREST($releasedata->package);
+            $this->savePackageMaintainersWithRoleREST($releasedata->package);
             $this->saveReleaseREST($releasedata->package, $releasedata->version);
             $this->saveAllReleasesREST($releasedata->package);
             $this->savePackagesCategoryREST($category);

@@ -57,6 +57,8 @@ class Chiara_PEAR_Server_REST
 
         $info = '<?xml version="1.0" encoding="iso-8859-1" ?>
 <r xmlns="http://pear.php.net/dtd/rest.release"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
     xsi:schemaLocation="http://pear.php.net/dtd/rest.release
     http://pear.php.net/dtd/rest.release.xsd">
  <p xlink:href="' . $extra . 'p/' . strtolower($release['package']) . '">' . $release['package'] . '</p>
@@ -88,6 +90,8 @@ class Chiara_PEAR_Server_REST
     {
         return '<?xml version="1.0" encoding="UTF-8" ?>' . "\n" .
 '<a xmlns="http://pear.php.net/dtd/rest.allreleases"' . "\n" .
+'    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"' . "\n" .
+'    xmlns:xlink="http://www.w3.org/1999/xlink"' . "\n" .
 '    xsi:schemaLocation="http://pear.php.net/dtd/rest.allreleases' . "\n" .
 '    http://pear.php.net/dtd/rest.allreleases.xsd">' . "\n" .
 ' <p>' . htmlspecialchars($package) . '</p>' . "\n" .
@@ -234,7 +238,7 @@ class Chiara_PEAR_Server_REST
         $catinfo = $this->_backend->categoryInfo(
             $this->_backend->categoryFromId($package['category_id']));
         if ($package['parent']) {
-            $parent = '<pa xlink:href="' . $extra . 'p/' . $package['parent'] . '">' . 
+            $parent = '<pa xlink:href="' . $extra . 'p/' . $package['parent'] . '">' .
                 $package['parent'] . '</pa>
 ';
         } else {
@@ -308,6 +312,8 @@ class Chiara_PEAR_Server_REST
         }
         $info = '<?xml version="1.0" encoding="iso-8859-1" ?>
 <c xmlns="http://pear.php.net/dtd/rest.category"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
     xsi:schemaLocation="http://pear.php.net/dtd/rest.category
     http://pear.php.net/dtd/rest.category.xsd">
  <n>' . htmlspecialchars($category['name']) . '</n>
@@ -322,6 +328,8 @@ class Chiara_PEAR_Server_REST
             DIRECTORY_SEPARATOR . 'info.xml', 0666);
         $list = '<?xml version="1.0" encoding="iso-8859-1" ?>
 <l xmlns="http://pear.php.net/dtd/rest.categorypackages"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
     xsi:schemaLocation="http://pear.php.net/dtd/rest.categorypackages
     http://pear.php.net/dtd/rest.categorypackages.xsd">
 ';
@@ -342,6 +350,8 @@ class Chiara_PEAR_Server_REST
     {
         return "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" .
 "<p xmlns=\"http://pear.php.net/dtd/rest.package\"" .
+"    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" .
+"    xmlns:xlink=\"http://www.w3.org/1999/xlink\"" .
 "    xsi:schemaLocation=\"http://pear.php.net/dtd/rest.package" .
 '    http://pear.php.net/dtd/rest.package.xsd">';
     }
@@ -363,6 +373,8 @@ class Chiara_PEAR_Server_REST
         $packages = $this->_backend->listPackagesInCategory($category);
         $fullpackageinfo = '<?xml version="1.0" encoding="UTF-8" ?>
 <f xmlns="http://pear.php.net/dtd/rest.categorypackageinfo"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
     xsi:schemaLocation="http://pear.php.net/dtd/rest.categorypackageinfo
     http://pear.php.net/dtd/rest.categorypackageinfo.xsd">
 ';
@@ -454,6 +466,8 @@ class Chiara_PEAR_Server_REST
         $categories = $this->_backend->listCategories();
         $info = '<?xml version="1.0" encoding="UTF-8" ?>
 <a xmlns="http://pear.php.net/dtd/rest.allcategories"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
     xsi:schemaLocation="http://pear.php.net/dtd/rest.allcategories
     http://pear.php.net/dtd/rest.allcategories.xsd">
 <ch>' . $this->_channel . '</ch>
@@ -529,6 +543,8 @@ class Chiara_PEAR_Server_REST
 
         $info = '<?xml version="1.0" encoding="iso-8859-1" ?>
 <a xmlns="http://pear.php.net/dtd/rest.allpackages"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
     xsi:schemaLocation="http://pear.php.net/dtd/rest.allpackages
     http://pear.php.net/dtd/rest.allpackages.xsd">
  <c>' . htmlspecialchars($this->_channel) . '</c>
@@ -560,6 +576,8 @@ class Chiara_PEAR_Server_REST
             }
             $info = '<?xml version="1.0" encoding="iso-8859-1" ?>
 <m xmlns="http://pear.php.net/dtd/rest.packagemaintainers"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
     xsi:schemaLocation="http://pear.php.net/dtd/rest.packagemaintainers
     http://pear.php.net/dtd/rest.packagemaintainers.xsd">
  <p>' . $package . '</p>
@@ -581,6 +599,48 @@ class Chiara_PEAR_Server_REST
         }
     }
 
+    public function savePackageMaintainersWithRoleREST($package)
+    {
+        $channelinfo = parse_url($this->_channel);
+        if (isset($channelinfo['host'])) {
+            $extra = $channelinfo['path'] . '/Chiara_PEAR_Server_REST/';
+        } else {
+            $extra = '/Chiara_PEAR_Server_REST/';
+        }
+        $maintainers = $this->_backend->listPackageMaintainers($package);
+        if (count($maintainers)) {
+            $pdir = $this->_restdir . DIRECTORY_SEPARATOR . 'p';
+            if (!file_exists($pdir . DIRECTORY_SEPARATOR . strtolower($package))) {
+                System::mkdir(array('-p', $pdir . DIRECTORY_SEPARATOR . strtolower($package)));
+                @chmod($pdir . DIRECTORY_SEPARATOR . strtolower($package), 0777);
+            }
+            $info = '<?xml version="1.0" encoding="iso-8859-1" ?>
+<m xmlns="http://pear.php.net/dtd/rest.packagemaintainers"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xsi:schemaLocation="http://pear.php.net/dtd/rest.packagemaintainers
+    http://pear.php.net/dtd/rest.packagemaintainers.xsd">
+ <p>' . $package . '</p>
+ <c>' . htmlspecialchars($this->_channel) . '</c>
+';
+            foreach ($maintainers as $maintainer) {
+                $info .= ' <m><h>' . $maintainer->handle . '</h><a>' .
+                    ($maintainer->active ? '1' : '0') .
+                    '</a><r>'.
+                    $maintainer->role.
+                    '</r></m>';
+            }
+            $info .= '</m>';
+            file_put_contents($pdir . DIRECTORY_SEPARATOR . strtolower($package) .
+                DIRECTORY_SEPARATOR . 'maintainers2.xml', $info);
+            @chmod($pdir . DIRECTORY_SEPARATOR . strtolower($package) .
+                DIRECTORY_SEPARATOR . 'maintainers2.xml', 0666);
+        } else {
+            @unlink($pdir . DIRECTORY_SEPARATOR . strtolower($package) .
+                DIRECTORY_SEPARATOR . 'maintainers2.xml', $info);
+        }
+    }
+
     public function saveAllMaintainersREST()
     {
         $channelinfo = parse_url($this->_channel);
@@ -592,6 +652,8 @@ class Chiara_PEAR_Server_REST
         $maintainers = $this->_backend->listMaintainers();
         $info = '<?xml version="1.0" encoding="UTF-8" ?>
 <m xmlns="http://pear.php.net/dtd/rest.allmaintainers"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
     xsi:schemaLocation="http://pear.php.net/dtd/rest.allmaintainers
     http://pear.php.net/dtd/rest.allmaintainers.xsd">' . "\n";
         // package information
@@ -630,6 +692,8 @@ class Chiara_PEAR_Server_REST
         }
         $info = '<?xml version="1.0" encoding="iso-8859-1" ?>
 <m xmlns="http://pear.php.net/dtd/rest.maintainer"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
     xsi:schemaLocation="http://pear.php.net/dtd/rest.maintainer
     http://pear.php.net/dtd/rest.maintainer.xsd">
  <h>' . $maintainer->handle . '</h>
@@ -653,7 +717,7 @@ class Chiara_PEAR_Server_REST
         $mdir = $this->_restdir . DIRECTORY_SEPARATOR . 'm';
         if (file_exists($mdir . DIRECTORY_SEPARATOR . $maintainer->handle)) {
             System::rm(array('-r', $mdir . DIRECTORY_SEPARATOR . $maintainer->handle));
-        }        
+        }
     }
 }
 ?>

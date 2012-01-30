@@ -631,6 +631,7 @@ $server->run();
             $backend->savePackageREST($package['package']);
             $this->outputData('    Maintainers...');
             $backend->savePackageMaintainersREST($package['package']);
+            $backend->savePackageMaintainersWithRoleREST($package['package']);
             $releases = $backend->listReleases($package['package']);
             if (count($releases)) {
                 $this->outputData('    Processing releases');

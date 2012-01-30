@@ -615,6 +615,8 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
                         $info->package = $package;
                         if ($this->_backend->updatePackageMaintainer($info)) {
                             $this->_quickForm->addElement('header', '', 'Changes to ' . $info->handle . ' Saved');
+                            $this->_backend->savePackageMaintainersREST($info->package);
+                            $this->_backend->savePackageMaintainersWithRoleREST($info->package);
                         } else {
                             $this->_quickForm->addElement('header', '', 'Changes to ' . $info->handle . ' Failed!');
                         }
@@ -630,6 +632,8 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
                         try {
                             if ($this->_backend->addPackageMaintainer($info)) {
                                 $this->_quickForm->addElement('header', '', 'Addition of ' . $info->handle . ' to Package Succeeded');
+                                $this->_backend->savePackageMaintainersREST($info->package);
+                                $this->_backend->savePackageMaintainersWithRoleREST($info->package);
                             } else {
                                 $this->_quickForm->addElement('header', '', 'Addition of ' . $info->handle . ' Failed!');
                             }
