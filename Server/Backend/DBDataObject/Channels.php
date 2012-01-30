@@ -14,6 +14,7 @@ class Chiara_PEAR_Server_Backend_DBDataObject_Channels extends DB_DataObject
     var $channel;                         // string(100)  not_null primary_key
     var $summary;                         // string(255)  not_null
     var $alias;                           // string(100)  not_null
+    var $rest_support;                    // int(6)       not_null
     var $validatepackage;                 // string(255)  
     var $validatepackageversion;          // string(25)  
 

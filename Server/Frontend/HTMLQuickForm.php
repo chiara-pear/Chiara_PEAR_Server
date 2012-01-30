@@ -373,8 +373,16 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
                 if ($this->_server->deleteRelease($this->_channel, $package, $_REQUEST['deleteRelease']));
             }
             if (isset($_REQUEST['deletePackage'])) {
-                if ($this->_backend->deletePackage($pacakge));
+                if (!$this->_backend->deletePackage($package)) {
+                    throw new Chiara_PEAR_Server_ExceptionPackageDoesntExist($package, $this->_channel);
+                }
+                $this->_quickForm->addElement('header', '', 'Package "' . $package
+                    . '" deleted successfully');
+                echo $this->_quickForm->toHtml();
+                return;
             }
+            $delete = '<a href="' . $this->_index . '?f=' .
+            $this->_server->getMethodIndex('deletePackage') . '&managepackage=' . $package;
             $self = '<a href="' . $this->_index . '?f=' .
             $this->_server->getMethodIndex('managePackage') . '&managepackage=' . $package;
             $info = $this->_backend->getPackage($package);
@@ -427,6 +435,7 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
             $this->_quickForm->addElement('text', 'deprecated_channel', 'New Package Channel');
             $this->_quickForm->addElement('text', 'deprecated_package', 'New Package Name');
             $this->_quickForm->addElement('submit', 'submitted', 'Save Changes');
+            $this->_quickForm->addElement('submit', 'deletePackage', 'Delete Package');
             $this->_quickForm->addRule('name', 'Required', 'required');
             $this->_quickForm->addRule('license', 'Required', 'required');
             $this->_quickForm->addRule('summary', 'Required', 'required');
@@ -453,7 +462,8 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
                 if (!$this->_backend->deleteCategory($category)) {
                     throw new Chiara_PEAR_Server_ExceptionCategoryDoesntExist($_REQUEST, $this->_channel);
                 }
-                $this->_quickForm->addElement('header', '', 'Category "' .$category. '" deleted successfully');
+                $this->_quickForm->addElement('header', '', 'Category "' . $category.
+                    '" deleted successfully');
                 echo $this->_quickForm->toHtml();
                 return;
             }
@@ -607,6 +617,15 @@ class Chiara_PEAR_Server_Frontend_HTMLQuickForm extends Chiara_PEAR_Server_Front
     {
         try {
             $info = $this->_backend->getMaintainer($maintainer);
+            if (isset($_REQUEST['deleteMaintainer'])) {
+                if (!$this->_backend->deleteMaintainer($info)) {
+                    throw new Chiara_PEAR_Server_ExceptionMaintainerDoesntExist($maintainer);
+                }
+                $this->_quickForm->addElement('header', '', 'Maintainer "' . $maintainer
+                    . '" deleted successfully');
+                echo $this->_quickForm->toHtml();
+                return;
+            }
             if (isset($_REQUEST['submitted'])) {
                 if ($this->_quickForm->validate()) {
                     $stuff = $this->_quickForm->getSubmitValues();

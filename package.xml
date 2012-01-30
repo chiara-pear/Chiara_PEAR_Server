@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" packagerversion="1.4.0a11" version="2.0" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
+<package xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" packagerversion="1.4.0a12" version="2.0" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
  <name>Chiara_PEAR_Server</name>
  <channel>chiara-local</channel>
  <summary>A lightweight pearweb-compatible channel server for hosting a PEAR channel</summary>
@@ -22,48 +22,50 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
   <email>davey@php.net</email>
   <active>yes</active>
  </lead>
- <date>2005-04-17</date>
- <time>17:22:18</time>
+ <date>2005-05-28</date>
+ <time>20:04:07</time>
  <version>
-  <release>0.17.0</release>
-  <api>0.17.0</api>
+  <release>0.18.0</release>
+  <api>0.18.0</api>
  </version>
  <stability>
   <release>alpha</release>
   <api>alpha</api>
  </stability>
- <license uri="http://www.php.net/license/3_0.txt">PHP License</license>
- <notes>Implement ssl, port, path options for channel server connection and xmlrpc.php file name
-    rename to Chiara_PEAR_Server
-    add ability to deprecate a package in favor of another</notes>
+ <license uri="http://www.php.net/license">PHP License</license>
+ <notes>Implement REST support
+    Remove XML-RPC support entirely
+    fix subpackage support
+    fix package.info
+    fix PHP5 issue with visibility of Xmlrpc5 server contructor
+    add the ability to delete a package</notes>
  <contents>
   <dir baseinstalldir="Chiara/PEAR" name="/">
-   <file baseinstalldir="Chiara/PEAR" md5sum="c04ff565dc2a65e02c7d4f02bc66486a" name="data/DBDataObject/pearserver.ini" role="data"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="5ab56d0bd9c21cb3f061fcc357246fba" name="data/pearserver.sql" role="data"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="07ba3a53b03a622fb560e3cdbc30093a" name="data/upgrade-0.12.0_0.13.0.sql" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="351a9e38af3b04e3b84ba701e43353a2" name="data/DBDataObject/pearserver.ini" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="9245dd65f9a98d7e372736b5f7f428a9" name="data/deprecatedpackages-chiara_pear_server-0.17.0.sql" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="24c374efc193f3483a3690a48f3683ba" name="data/pearserver.sql" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="73cf7006a8e0825da5ab6bfb7794f1fa" name="data/pear_server.css" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="c8727151021b67366e1abe2b2cc3f8f9" name="data/restsupport-0.18.0.sql" role="data"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="07ba3a53b03a622fb560e3cdbc30093a" name="data/upgrade-0.12.0_0.13.0.sql" role="data"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="4110a5fe9147a91cf149c1535186e9c6" name="examples/xmlrpc.php" role="doc"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="5b1d73213d5f3e7ba662388903dd3733" name="Server/Backend/DBDataObject/Categories.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="e5867bc45d45faf270cb76ade52c0113" name="Server/Backend/DBDataObject/Channels.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="d0a32230f78482b0f22687f7eaf72105" name="Server/Backend/DBDataObject/Categories.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="f664b1e16e2f7850aa379199b43d4fbf" name="Server/Backend/DBDataObject/Channels.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="23240d57f6c258055891f193c26c7f68" name="Server/Backend/DBDataObject/Handles.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="917fd9ebee14b119dc1e3cdee55bda77" name="Server/Backend/DBDataObject/Maintainers.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="44286b6ff1f20c26fdc5484755724789" name="Server/Backend/DBDataObject/Packages.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="58d8fa33aef8e2507a675b0185d47785" name="Server/Backend/DBDataObject/Package_extras.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="7c37f9f66076c50914d23f264c3e13e7" name="Server/Backend/DBDataObject/Releases.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="4e1ebe8bca2006036b4cdb1d2ade8afa" name="Server/Backend/DBDataObject.php" role="php">
+   <file baseinstalldir="Chiara/PEAR" md5sum="d749330b985afce4214f227a98af981f" name="Server/Backend/DBDataObject.php" role="php">
     <tasks:replace from="@data-dir@" to="data_dir" type="pear-config"/>
     <tasks:replace from="@php-dir@" to="php_dir" type="pear-config"/>
    </file>
-   <file baseinstalldir="Chiara/PEAR" md5sum="9cb1b35686d18df392af2a3feb16a94b" name="Server/Frontend/HTMLQuickForm.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="4f7d5affb49cd38ab50911be9f27c038" name="Server/Frontend/Xmlrpc.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="591b1331054554428da86132857d4b17" name="Server/Frontend/Xmlrpc5.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="cfb98683244a51cbfdf72b08dac2b190" name="Server/Backend.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="3cc0f2fdf6f8242a4f4c1e32e060f833" name="Server/Exception.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="7be3af5b00b33f009009a46b8c914273" name="Server/Frontend/HTMLQuickForm.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="4eaebb18e250596ebd3931348403f160" name="Server/Backend.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="314aefbeefc364b0969235ac4566cb49" name="Server/Exception.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="e7c92c79ed7d708a2e67b66dbdb62daf" name="Server/Frontend.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="b45466760ee1535b6fde965bd4ca3c84" name="Server/Maintainer.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="c3d7283ad0344474b23878a082c2e69e" name="Server/Package.php" role="php"/>
-   <file baseinstalldir="Chiara/PEAR" md5sum="0dea0811f6d843b698203c48cd16dce4" name="Server/mysqlinstall.php" role="php">
+   <file baseinstalldir="Chiara/PEAR" md5sum="d2f5bf50575065424870baaee1bdd196" name="Server/Package.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="0d9490718cfbd43cc8762eb29076150d" name="Server/mysqlinstall.php" role="php">
     <tasks:postinstallscript>
      <paramgroup>
       <id>questionCreate</id>
@@ -156,12 +158,6 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
        <type>string</type>
       </param>
       <param>
-       <name>xmlrpcphp</name>
-       <prompt>name of xmlrpc.php public XML-RPC frontend file</prompt>
-       <type>string</type>
-       <default>xmlrpc.php</default>
-      </param>
-      <param>
        <name>frontendphp</name>
        <prompt>name of frontend.php HTML admin frontend file</prompt>
        <type>string</type>
@@ -188,7 +184,50 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
     <tasks:replace from="@data-dir@" to="data_dir" type="pear-config"/>
     <tasks:replace from="@php-dir@" to="php_dir" type="pear-config"/>
    </file>
-   <file baseinstalldir="Chiara/PEAR" md5sum="7220a34493aff628d8a365edeba36fb2" name="Server/Release.php" role="php"/>
+   <file baseinstalldir="Chiara/PEAR" md5sum="50e34c84008188bc26918541e5a69b20" name="Server/restsetup.php" role="php">
+    <tasks:postinstallscript>
+     <paramgroup>
+      <id>processExistingReleases</id>
+      <param>
+       <name>database</name>
+       <prompt>Mysql database</prompt>
+       <type>string</type>
+       <default>pear</default>
+      </param>
+      <param>
+       <name>user</name>
+       <prompt>Mysql Username (must have create permision)</prompt>
+       <type>string</type>
+       <default>pear</default>
+      </param>
+      <param>
+       <name>password</name>
+       <prompt>Mysql password</prompt>
+       <type>string</type>
+       <default>pear</default>
+      </param>
+      <param>
+       <name>dbhost</name>
+       <prompt>Database Host</prompt>
+       <type>string</type>
+       <default>localhost</default>
+      </param>
+      <param>
+       <name>name</name>
+       <prompt>Channel Name (server uri like pear.php.net)</prompt>
+       <type>string</type>
+      </param>
+      <param>
+       <name>webroot</name>
+       <prompt>Path to document root (htdocs or public_html)</prompt>
+       <type>string</type>
+      </param>
+     </paramgroup>
+    </tasks:postinstallscript>
+    <tasks:replace from="@data-dir@" to="data_dir" type="pear-config"/>
+    <tasks:replace from="@php-dir@" to="php_dir" type="pear-config"/>
+   </file>
+   <file baseinstalldir="Chiara/PEAR" md5sum="3135f04354e34e2e16e258730de99e31" name="Server/Release.php" role="php"/>
    <file baseinstalldir="Chiara/PEAR" md5sum="54d54f556d49362039630ed0d84afd46" name="Server.php" role="php"/>
   </dir>
  </contents>
@@ -198,7 +237,7 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
     <min>5.0.0</min>
    </php>
    <pearinstaller>
-    <min>1.4.0a11</min>
+    <min>1.4.0a12</min>
    </pearinstaller>
    <package>
     <name>DB_DataObject</name>
@@ -209,10 +248,6 @@ Chiara_PEAR_Server replaces PEAR_Server</description>
     <name>HTML_QuickForm</name>
     <channel>pear.php.net</channel>
     <min>3.2.2</min>
-   </package>
-   <package>
-    <name>Chiara_XML_RPC5</name>
-    <channel>pear.chiaraquartet.net</channel>
    </package>
   </required>
   <optional>
@@ -469,9 +504,28 @@ fix package.info</notes>
     <release>alpha</release>
     <api>alpha</api>
    </stability>
-   <date>2005-03-24</date>
+   <date>2005-04-18</date>
    <license uri="http://www.php.net/license">PHP License</license>
-   <notes>Implement ssl, port, path options for channel server connection and xmlrpc.php file name</notes>
+   <notes>Implement ssl, port, path options for channel server connection and xmlrpc.php file name
+    rename to Chiara_PEAR_Server
+    add ability to deprecate a package in favor of another</notes>
+  </release>
+  <release>
+   <version>
+    <release>0.18.0</release>
+    <api>0.18.0</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2005-04-18</date>
+   <license uri="http://www.php.net/license">PHP License</license>
+   <notes>Implement REST support
+    fix subpackage support
+    fix package.info
+    fix PHP5 issue with visibility of Xmlrpc5 server contructor
+    add the ability to delete a package</notes>
   </release>
  </changelog>
 </package>

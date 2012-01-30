@@ -110,6 +110,11 @@ class Chiara_PEAR_Server_Release
         return $this->_releaser;
     }
 
+    public function getDependencies()
+    {
+        return $this->_packageInfo->getDependencies();
+    }
+
     public function getDeps($v2deps = true)
     {
         if ($v2deps) {

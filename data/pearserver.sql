@@ -33,6 +33,7 @@ CREATE TABLE channels (
   channel varchar(100) NOT NULL default '',
   summary varchar(255) NOT NULL default '',
   alias varchar(100) NOT NULL default '',
+  rest_support int(6) NOT NULL default '0',
   validatepackage varchar(255) default NULL,
   validatepackageversion varchar(25) default NULL,
   PRIMARY KEY  (channel)

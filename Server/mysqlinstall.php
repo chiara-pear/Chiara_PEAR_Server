@@ -255,14 +255,27 @@ class Server_mysqlinstall_postinstall
             if ($query) {
                 // upgrading?
                 if (extension_loaded('mysqli')) {
-                    $query = @mysqli_query($conn, 'SELECT channel_deprecated FROM packages');
+                    $query = @mysqli_query($conn, 'SELECT deprecated_package FROM packages');
                 } else {
-                    $query = @mysql_query('SELECT channel_deprecated FROM packages', $conn);
+                    $query = @mysql_query('SELECT deprecated_package FROM packages', $conn);
                 }
                 if (!$query) {
                     $a = $this->updateDatabase(
              '@data-dir@/Chiara_PEAR_Server/data/deprecatedpackages-chiara_pear_server-0.17.0.sql',
              'updating database to add deprecated package support', $conn);
+                    if (!$a) {
+                        return $a;
+                    }
+                }
+                if (extension_loaded('mysqli')) {
+                    $query = @mysqli_query($conn, 'SELECT rest_support FROM channels');
+                } else {
+                    $query = @mysql_query('SELECT rest_support FROM channels', $conn);
+                }
+                if (!$query) {
+                    $a = $this->updateDatabase(
+                        '@data-dir@/Chiara_PEAR_Server/data/restsupport-0.18.0.sql',
+                        'updating database to add REST xml support', $conn);
                     if (!$a) {
                         return $a;
                     }
@@ -295,6 +308,19 @@ class Server_mysqlinstall_postinstall
         } else {
             if ($query) {
                 $this->databaseExists = true;
+                if (extension_loaded('mysqli')) {
+                    $query = @mysqli_query($conn, 'SELECT rest_support FROM channels');
+                } else {
+                    $query = @mysql_query('SELECT rest_support FROM channels', $conn);
+                }
+                if (!$query) {
+                    $a = $this->updateDatabase(
+                        '@data-dir@/Chiara_PEAR_Server/data/restsupport-0.18.0.sql',
+                        'updating database to add REST xml support', $conn);
+                    if (!$a) {
+                        return $a;
+                    }
+                }
                 if (extension_loaded('mysqli')) {
                     $query = @mysqli_query($conn, 'SELECT channel_deprecated FROM packages');
                 } else {
@@ -467,15 +493,12 @@ class Server_mysqlinstall_postinstall
         $chan->setName($dbo->channel);
         $chan->setSummary($dbo->summary);
         $chan->setAlias($dbo->alias);
-        $chan->setDefaultPEARProtocols();
+        $chan->setBaseURL('REST1.0', 'http://' . $dbo->channel . '/Chiara_PEAR_Server_REST/');
         if ($this->port != 80) {
             $chan->setPort($this->port);
         }
         if ($this->ssl) {
             $chan->setSSL();
-        }
-        if ($this->xmlrpcphp != 'xmlrpc.php') {
-            $chan->setPath('xmlrpc', $this->xmlrpcphp);
         }
         if (!$this->_registry->channelExists($dbo->channel)) {
             $this->_registry->addChannel($chan);
@@ -483,7 +506,6 @@ class Server_mysqlinstall_postinstall
             $this->_registry->updateChannel($chan);
         }
         $xml = $chan->toXml();
-        $this->xmlrpcphp = $answers['xmlrpcphp'];
         $this->ssl = ($answers['ssl'] == 'https');
         $this->port = $answers['port'];
         $this->frontend = $answers['frontendphp'];
@@ -513,28 +535,6 @@ class Server_mysqlinstall_postinstall
         $config = 'array(\'database\'         => \'' .
             $type . '://' . $this->user . ':' . $this->password . '@' . $this->dbhost .
             '/' . $this->db . '\')';
-        $contents = '<?php
-require_once \'Chiara/PEAR/Server.php\';
-require_once \'Chiara/PEAR/Server/Backend/DBDataObject.php\';
-require_once \'Chiara/PEAR/Server/Frontend/Xmlrpc5.php\';
-$backend = new Chiara_PEAR_Server_Backend_DBDataObject(\'' . $this->channel . '\', ' . $config . ');
-$frontend = Chiara_PEAR_Server_Frontend_Xmlrpc5::singleton(\'' . $this->channel . '\');
-$server = new Chiara_PEAR_Server(\'' . $answers['docroot'] . DIRECTORY_SEPARATOR . 'get' . '\');
-$server->setBackend($backend);
-$server->setFrontend($frontend);
-$server->run();
-?>';
-        $fp = fopen($answers['docroot'] . DIRECTORY_SEPARATOR . $this->xmlrpcphp, 'w');
-        $a = fwrite($fp, $contents, strlen($contents));
-        fclose($fp);
-        if ($a) {
-            $this->_ui->outputData('Successfully created ' .
-                $answers['docroot'] . DIRECTORY_SEPARATOR . $this->xmlrpcphp);
-        } else {
-            $this->_ui->outputData('Could not create ' .
-                $answers['docroot'] . DIRECTORY_SEPARATOR . $this->xmlrpcphp);
-            return false;
-        }
 
         // create frontend.php
         $extraconf = '';
@@ -552,7 +552,8 @@ $server->run();
 ' . $extraconf . 'require_once \'Chiara/PEAR/Server.php\';
 require_once \'Chiara/PEAR/Server/Backend/DBDataObject.php\';
 require_once \'Chiara/PEAR/Server/Frontend/HTMLQuickForm.php\';
-$backend = new Chiara_PEAR_Server_Backend_DBDataObject(\'' . $this->channel . '\', ' . $config . ');
+$backend = new Chiara_PEAR_Server_Backend_DBDataObject(\'' . $this->channel . '\',
+    \'' . $answers['docroot'] . DIRECTORY_SEPARATOR . 'Chiara_PEAR_Server_REST\', ' . $config . ');
 $frontend = new Chiara_PEAR_Server_Frontend_HTMLQuickForm(\'' . $this->channel .
         '\', new HTML_QuickForm(\'channel\'),
         \'' . $answers['frontendphp'] . '\', \'' . $answers['uploadpath'] . '\');

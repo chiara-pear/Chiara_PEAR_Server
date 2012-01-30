@@ -226,12 +226,45 @@ class Chiara_PEAR_Server_ExceptionXsdversion1_0 extends Chiara_PEAR_Server_Excep
 
 class Chiara_PEAR_Server_ExceptionInvalidRelease extends Chiara_PEAR_Server_Exception
 {
-    protected $_message = 'Invalid release uploaded';
+    protected $_message = 'Invalid release uploaded: "%info%"';
 
     public function __construct($packagefile, $msg = false)
     {
-        $this->_data = array();
-        parent::__construct($msg ? $msg : $this->_message, $packagefile->getUserInfo());
+        $this->_data = array('info' => $packagefile->getUserInfo());
+        parent::__construct($msg ? $msg : $this->_message);
+    }
+}
+
+class PEAR_Server_ExceptionReleaseNotFound extends Chiara_PEAR_Server_Exception
+{
+    protected $_message = 'Package %p% release %v% does not exist';
+
+    public function __construct($package, $version, $msg = false)
+    {
+        $this->_data = array('p' => $package, 'v' => $version);
+        parent::__construct($msg ? $msg : $this->_message);
+    }
+}
+
+class Chiara_PEAR_Server_ExceptionCannotDeleteHasReleases extends Chiara_PEAR_Server_Exception
+{
+    protected $_message = 'Package %p% in channel %c% cannot be deleted, delete all releases first';
+
+    public function __construct($package, $channel, $msg = false)
+    {
+        $this->_data = array('p' => $package, 'c' => $channel);
+        parent::__construct($msg ? $msg : $this->_message);
+    }
+}
+
+class Chiara_PEAR_Server_ExceptionMaintainerManagesPackages extends Chiara_PEAR_Server_Exception
+{
+    protected $_message = 'Maintainer %m% cannot be deleted, this maintainer maintains packages';
+
+    public function __construct($maintainer, $msg = false)
+    {
+        $this->_data = array('m' => $maintainer);
+        parent::__construct($msg ? $msg : $this->_message);
     }
 }
 ?>

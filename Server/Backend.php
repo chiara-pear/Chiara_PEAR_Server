@@ -3,10 +3,12 @@ require_once 'Chiara/PEAR/Server/Maintainer.php';
 abstract class Chiara_PEAR_Server_Backend
 {
     protected $_channel;
+    protected $_restdir;
 
-    public function __construct($channel)
+    public function __construct($channel, $restdir = false)
     {
         $this->_channel = $channel;
+        $this->_restdir = $restdir;
     }
 
     public function getChannel()
@@ -22,7 +24,21 @@ abstract class Chiara_PEAR_Server_Backend
         return false;
     }
 
+    abstract public function saveReleaseREST($package, $version);
+
+    abstract public function saveAllReleasesREST($package);
+
+    abstract public function savePackageREST($package);
+
+    abstract public function deletePackageREST($package, $category);
+
+    abstract public function saveCategoryREST($category);
+
+    abstract public function deleteCategoryREST($category);
+
     abstract public function deleteRelease($packagename, $version);
+
+    abstract public function deleteReleaseREST($packagename, $version);
 
     abstract public function getReleasePath($packagename, $version);
 
@@ -51,6 +67,22 @@ abstract class Chiara_PEAR_Server_Backend
 
     abstract public function listPackages($releasedOnly = true, $onlyStable = true, $nosubpackages = true);
 
+    abstract public function listPackagesInCategory($category);
+
+    abstract public function listCategories();
+
+    abstract public function addCategory($cat);
+
+    abstract public function updateCategory($cat);
+
+    abstract public function getCategory($cat);
+
+    abstract public function deleteCategory($cat);
+
+    abstract public function categoryFromId($cat);
+
+    abstract public function categoryInfo($cat);
+
     abstract public function listDeps($package, $version);
 
     /**
@@ -62,6 +94,8 @@ abstract class Chiara_PEAR_Server_Backend
      * @param Chiara_PEAR_Server_Package
      */
     abstract public function addPackage($package);
+
+    abstract public function deletePackage($packagename);
 
     /**
      * @param Chiara_PEAR_Server_Package

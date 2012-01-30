@@ -68,11 +68,14 @@ class Chiara_PEAR_Server_Package implements Iterator
 
     public function __set($var, $value)
     {
+        if (is_string($value)) {
+            $value = trim($value);
+        }
         if ($var == 'maintainer') {
-            $this->$this->properties['maintainers'][$value[0]] = $value;
+            $this->properties['maintainers'][$value[0]] = $value;
         }
         if ($var == 'maintainers') {
-            $this->$this->properties['maintainers'] = $value;
+            $this->properties['maintainers'] = $value;
         }
         if (isset($this->properties[$var])) {
             if ($value === null) {
